@@ -57,13 +57,13 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
                     .init(id: "tab-conferences", name: "Conferences", type: .conferences),
                     .init(id: "tab-quizzes", name: "Quizzes", type: .quizzes),
                     .init(id: "tab-discussions", name: "Discussions", type: .discussions),
-                    .init(id: "tab-modules", name: "Modules", type: .modules),
+                    .init(id: "tab-modules", name: "Modules", type: .modules)
                 ],
                 files: [
                     .make(id: "file-1", displayName: "1", url: URL(string: "1.jpg")!, bytesToDownload: 1000),
-                    .make(id: "file-2", displayName: "2", url: URL(string: "2.jpg")!, bytesToDownload: 1000),
+                    .make(id: "file-2", displayName: "2", url: URL(string: "2.jpg")!, bytesToDownload: 1000)
                 ]
-            ),
+            )
         ]
     }
 
@@ -80,6 +80,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
 
     func testDownloadState() {
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [pagesInteractor, assignmentsInteractor],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -133,6 +134,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
 
     func testFilesLoadingState() {
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -174,6 +176,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
 
     func testFilesDownloadedBytes() {
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -216,6 +219,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
 
     func testFilesPartialSelection() {
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -257,6 +261,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
 
     func testAssignmentErrorState() {
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [assignmentsInteractor],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -290,6 +295,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
 
     func testPagesErrorState() {
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [pagesInteractor],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -323,6 +329,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
 
     func testFilesErrorState() {
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -360,6 +367,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
         let syllbusDownloadStarted = expectation(description: "Syllabus download started")
         let mockSyllabusInteractor = CourseSyncSyllabusInteractorMock(expectation: syllbusDownloadStarted)
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [mockSyllabusInteractor],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -383,6 +391,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
         let conferencesDownloadStarted = expectation(description: "Conferences download started")
         let mockConferencesInteractor = CourseSyncConferencesInteractorMock(expectation: conferencesDownloadStarted)
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [mockConferencesInteractor],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -405,10 +414,11 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
         let expectation = expectation(description: "Quizzes download started")
         let mockQuizzesInteractor = CourseSyncQuizzesInteractorMock(expectation: expectation)
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [
                 pagesInteractor,
                 assignmentsInteractor,
-                mockQuizzesInteractor,
+                mockQuizzesInteractor
             ],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -431,10 +441,11 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
         let expectation = expectation(description: "Discussions download started")
         let mockDiscussionsInteractor = CourseSyncDiscussionsInteractorMock(expectation: expectation)
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [
                 pagesInteractor,
                 assignmentsInteractor,
-                mockDiscussionsInteractor,
+                mockDiscussionsInteractor
             ],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -457,9 +468,10 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
         let expectation = expectation(description: "Modules download started")
         let mockModulesInteractor = CourseSyncModulesInteractorMock(expectation: expectation)
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [
                 pagesInteractor,
-                assignmentsInteractor,
+                assignmentsInteractor
             ],
             filesInteractor: filesInteractor,
             modulesInteractor: mockModulesInteractor,
@@ -487,12 +499,13 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
                 hasFrontPage: true,
                 tabs: [.init(id: "tab-assignments", name: "Assignments", type: .assignments)],
                 files: []
-            ),
+            )
         ]
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [
                 mockPagesInteractor,
-                assignmentsInteractor,
+                assignmentsInteractor
             ],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -517,10 +530,11 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
         let mockDiscussionsInteractor = CourseSyncDiscussionsInteractorMock(expectation: discussionExpectation)
 
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [
                 mockAssignmentsInteractor,
                 pagesInteractor,
-                mockDiscussionsInteractor,
+                mockDiscussionsInteractor
             ],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -543,10 +557,11 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
     func testAssociatedModuleItemsWithDisabledTabs() {
         let modulesInteractor = CourseSyncModulesInteractorMock2()
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [
                 pagesInteractor,
                 assignmentsInteractor,
-                CourseSyncDiscussionsInteractorPublisherMock(),
+                CourseSyncDiscussionsInteractorPublisherMock()
             ],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -576,7 +591,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
             .make(from: .make(id: "discussion-id", content: .discussion("discussion-id"))),
             .make(from: .make(id: "file-id", content: .file("file-id"))),
             .make(from: .make(id: "quiz-id", content: .discussion("quiz-id"))),
-            .make(from: .make(id: "pages-id", content: .discussion("pages-id"))),
+            .make(from: .make(id: "pages-id", content: .discussion("pages-id")))
 
         ])
 
@@ -591,6 +606,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
 
     func testInitialLoadingState() {
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [pagesInteractor, assignmentsInteractor],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -640,9 +656,10 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
     func testCancellationViaNotification() {
         // GIVEN
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [
                 pagesInteractor,
-                assignmentsInteractor,
+                assignmentsInteractor
             ],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -675,9 +692,10 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
     func testCancellation() {
         // GIVEN
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [
                 pagesInteractor,
-                assignmentsInteractor,
+                assignmentsInteractor
             ],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -713,8 +731,9 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
         let courseSyncNotificationMock = CourseSyncNotificationMock(localNotifications: LocalNotificationsInteractor(notificationCenter: notificationCenter),
                                                                     progressInteractor: CourseSyncProgressObserverInteractorMock())
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [
-                assignmentsInteractor,
+                assignmentsInteractor
             ],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -742,6 +761,7 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
     func testDownloadCourseListData() {
         let listInteractorMock = CourseListInteractorMock()
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -763,11 +783,37 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
         subscription.cancel()
     }
 
+    func testDownloadBrandTheme() {
+        let brandThemeInteractorMock = BrandThemeDownloaderInteractorMock()
+        let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: brandThemeInteractorMock,
+            contentInteractors: [],
+            filesInteractor: filesInteractor,
+            modulesInteractor: modulesInteractor,
+            progressWriterInteractor: CourseSyncProgressWriterInteractorLive(container: database),
+            notificationInteractor: CourseSyncNotificationMock(progressInteractor: CourseSyncProgressObserverInteractorMock()),
+            courseListInteractor: CourseListInteractorMock(),
+            backgroundActivity: BackgroundActivityMock(),
+            scheduler: .immediate,
+            env: environment
+        )
+
+        // WHEN
+        let subscription = testee
+            .downloadContent(for: entries)
+            .sink()
+
+        // THEN
+        XCTAssertTrue(brandThemeInteractorMock.getContentCalled)
+        subscription.cancel()
+    }
+
     func testHandlesBackgroundSyncInterruption() {
         let backgroundActivityMock = BackgroundActivityMock()
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [
-                assignmentsInteractor,
+                assignmentsInteractor
             ],
             filesInteractor: filesInteractor,
             modulesInteractor: modulesInteractor,
@@ -800,8 +846,9 @@ class CourseSyncInteractorLiveTests: CoreTestCase {
     func testCancelsBackgroundActivityOnCancel() {
         let backgroundActivityMock = BackgroundActivityMock()
         let testee = CourseSyncInteractorLive(
+            brandThemeInteractor: BrandThemeDownloaderInteractorMock(),
             contentInteractors: [
-                assignmentsInteractor,
+                assignmentsInteractor
             ],
             filesInteractor: filesInteractor,
             modulesInteractor: CourseSyncModulesInteractorMock(),
@@ -1022,5 +1069,14 @@ private class CourseSyncModulesInteractorMock2: CourseSyncModulesInteractor {
 
     func getAssociatedModuleItems(courseId _: String, moduleItemTypes _: Set<Core.TabName>, moduleItems _: [Core.ModuleItem]) -> AnyPublisher<Void, Error> {
         associatedModuleItemsPublisher.eraseToAnyPublisher()
+    }
+}
+
+private class BrandThemeDownloaderInteractorMock: BrandThemeDownloaderInteractor {
+    public var getContentCalled = false
+
+    override func getContent() -> AnyPublisher<Void, Never> {
+        getContentCalled = true
+        return Just(()).eraseToAnyPublisher()
     }
 }

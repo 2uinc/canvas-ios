@@ -196,7 +196,7 @@ class FileDetailsViewControllerTests: CoreTestCase {
         let items = UIMenu(children: [
             UIAction(title: "", identifier: .PSPDFKit.comments) { _ in },
             UIAction(title: "", identifier: .PSPDFKit.inspector) { _ in },
-            UIAction(title: "", identifier: .PSPDFKit.delete) { _ in },
+            UIAction(title: "", identifier: .PSPDFKit.delete) { _ in }
         ])
         let results = controller.pdfViewController(pdf,
                                                    menuForAnnotations: [Annotation()],
@@ -301,6 +301,7 @@ class FileDetailsViewControllerTests: CoreTestCase {
 
     func testTeacher() {
         environment.app = .teacher
+        controller.canEdit = true
         controller.view.layoutIfNeeded()
 
         XCTAssert(controller.navigationItem.rightBarButtonItem == controller.editButton)

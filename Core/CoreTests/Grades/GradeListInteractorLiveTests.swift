@@ -49,7 +49,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                         user_id: currentSession.userID,
                         workflow_state: .submitted
                     )
-                ),
+                )
             ]
         ),
         .make(
@@ -62,7 +62,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     course_id: "1",
                     id: "2",
                     name: "Proof that proofs are useful"
-                ),
+                )
             ]
         ),
         .make(
@@ -92,9 +92,9 @@ class GradeListInteractorLiveTests: CoreTestCase {
                         workflow_state: .unsubmitted
                     ),
                     submission_types: [.on_paper]
-                ),
+                )
             ]
-        ),
+        )
     ]
 
     func mockGrades(gradingPeriodID: String?, score: Double?, grade: String? = nil) {
@@ -119,17 +119,37 @@ class GradeListInteractorLiveTests: CoreTestCase {
                         current_score: score,
                         final_score: score
                     )
-                ),
+                )
             ]
         )
     }
 
     override func setUp() {
         super.setUp()
-        api.mock(GetAssignmentsByGroup(courseID: "1"), value: groups)
-        api.mock(GetAssignmentsByGroup(courseID: "1", gradingPeriodID: "1"), value: [groups[0]])
-        api.mock(GetAssignmentsByGroup(courseID: "1", gradingPeriodID: "2"), value: [groups[1]])
-        api.mock(GetAssignmentsByGroup(courseID: "1", gradingPeriodID: "3"), value: [groups[2]])
+        var assignmentsRequest = GetAssignmentGroupsRequest(
+            courseID: "1",
+            gradingPeriodID: nil,
+            perPage: 100
+        )
+        api.mock(assignmentsRequest, value: groups)
+        assignmentsRequest = GetAssignmentGroupsRequest(
+            courseID: "1",
+            gradingPeriodID: "1",
+            perPage: 100
+        )
+        api.mock(assignmentsRequest, value: [groups[0]])
+        assignmentsRequest = GetAssignmentGroupsRequest(
+            courseID: "1",
+            gradingPeriodID: "2",
+            perPage: 100
+        )
+        api.mock(assignmentsRequest, value: [groups[1]])
+        assignmentsRequest = GetAssignmentGroupsRequest(
+            courseID: "1",
+            gradingPeriodID: "3",
+            perPage: 100
+        )
+        api.mock(assignmentsRequest, value: [groups[2]])
         api.mock(GetCustomColors(), value: .init(custom_colors: [:]))
         api.mock(
             GetCourse(courseID: "1"),
@@ -141,10 +161,10 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     user_id: currentSession.userID,
                     multiple_grading_periods_enabled: true,
                     current_grading_period_id: "1"
-                ),
+                )
             ])
         )
-        api.mock(GetGradingPeriods(courseID: "1"), value: [])
+        api.mock(GetGradingPeriods(courseID: "1"), value: [.make(id: "1")])
         mockGrades(gradingPeriodID: nil, score: 20)
         mockGrades(gradingPeriodID: "1", score: 20)
         mockGrades(gradingPeriodID: "2", score: nil)
@@ -165,9 +185,14 @@ class GradeListInteractorLiveTests: CoreTestCase {
         let assignmentGroups: [APIAssignmentGroup] = [
             .make(id: "1", name: "Group A", assignments: [.make(due_at: past, id: "1", lock_at: pastLockAt)]),
             .make(id: "2", name: "Group B", assignments: [.make(due_at: upcoming, id: "2", lock_at: upcomingLockAt)]),
-            .make(id: "3", name: "Group C", assignments: [.make(due_at: overdue, id: "3", lock_at: overdueLockAt)]),
+            .make(id: "3", name: "Group C", assignments: [.make(due_at: overdue, id: "3", lock_at: overdueLockAt)])
         ]
-        api.mock(GetAssignmentsByGroup(courseID: "1", gradingPeriodID: "1"), value: assignmentGroups)
+        let assignmentsRequest = GetAssignmentGroupsRequest(
+            courseID: "1",
+            gradingPeriodID: "1",
+            perPage: 100
+        )
+        api.mock(assignmentsRequest, value: assignmentGroups)
         let testee = GradeListInteractorLive(courseID: "1", userID: currentSession.userID)
         let expectation = expectation(description: "Publisher sends value")
         let subscription = testee.getGrades(arrangeBy: .dueDate, baseOnGradedAssignment: true, ignoreCache: true)
@@ -186,15 +211,25 @@ class GradeListInteractorLiveTests: CoreTestCase {
         drainMainQueue()
         waitForExpectations(timeout: 0.1)
         subscription.cancel()
+
+        Clock.reset()
     }
 
     func testGroupArrangement() {
         let assignmentGroups: [APIAssignmentGroup] = [
-            .make(id: "1", name: "Group A", assignments: [.make(id: "1")]),
-            .make(id: "2", name: "Group B", assignments: [.make(id: "2")]),
-            .make(id: "3", name: "Group C", assignments: [.make(id: "3"), .make(id: "4")]),
+            .make(id: "1", name: "Group A", assignments: [.make(assignment_group_id: "1", id: "1")]),
+            .make(id: "2", name: "Group B", assignments: [.make(assignment_group_id: "2", id: "2")]),
+            .make(id: "3", name: "Group C", assignments: [
+                .make(assignment_group_id: "3", id: "3"),
+                .make(assignment_group_id: "3", id: "4")
+            ])
         ]
-        api.mock(GetAssignmentsByGroup(courseID: "1", gradingPeriodID: "1"), value: assignmentGroups)
+        let assignmentsRequest = GetAssignmentGroupsRequest(
+            courseID: "1",
+            gradingPeriodID: "1",
+            perPage: 100
+        )
+        api.mock(assignmentsRequest, value: assignmentGroups)
         let testee = GradeListInteractorLive(courseID: "1", userID: currentSession.userID)
         let expectation = expectation(description: "Publisher sends value")
         let subscription = testee.getGrades(arrangeBy: .groupName, baseOnGradedAssignment: true, ignoreCache: false)
@@ -225,7 +260,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     user_id: currentSession.userID,
                     multiple_grading_periods_enabled: true,
                     current_grading_period_id: "1"
-                ),
+                )
             ],
             hide_final_grades: true)
         )
@@ -255,7 +290,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     multiple_grading_periods_enabled: true,
                     totals_for_all_grading_periods_option: false,
                     current_grading_period_id: nil
-                ),
+                )
             ])
         )
 
@@ -283,7 +318,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     user_id: currentSession.userID,
                     multiple_grading_periods_enabled: true,
                     current_grading_period_id: "1"
-                ),
+                )
             ],
             hide_final_grades: true,
             settings: .make(restrict_quantitative_data: true))
@@ -312,7 +347,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     enrollment_state: .active,
                     user_id: currentSession.userID,
                     current_grading_period_id: "1"
-                ),
+                )
             ])
         )
         api.mock(
@@ -331,7 +366,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     type: "StudentEnrollment",
                     user_id: currentSession.userID,
                     grades: .make(current_grade: "C", current_score: 42)
-                ),
+                )
             ]
         )
 
@@ -358,7 +393,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     enrollment_state: .active,
                     user_id: currentSession.userID,
                     current_grading_period_id: "1"
-                ),
+                )
             ])
         )
         api.mock(
@@ -377,7 +412,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     type: "StudentEnrollment",
                     user_id: currentSession.userID,
                     grades: .make(current_grade: "C", current_score: 42, final_score: 21)
-                ),
+                )
             ]
         )
 
@@ -404,7 +439,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     enrollment_state: .active,
                     user_id: currentSession.userID,
                     current_grading_period_id: nil
-                ),
+                )
             ])
         )
         api.mock(
@@ -423,7 +458,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     type: "StudentEnrollment",
                     user_id: currentSession.userID,
                     grades: .make(current_grade: "C", current_score: 42, final_score: 21)
-                ),
+                )
             ]
         )
 
@@ -451,7 +486,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     enrollment_state: .active,
                     user_id: currentSession.userID,
                     current_grading_period_id: "1"
-                ),
+                )
             ],
             settings: .make(restrict_quantitative_data: true))
         )
@@ -471,7 +506,7 @@ class GradeListInteractorLiveTests: CoreTestCase {
                     type: "StudentEnrollment",
                     user_id: currentSession.userID,
                     grades: .make(current_grade: "C", current_score: 42)
-                ),
+                )
             ]
         )
 

@@ -56,7 +56,12 @@ public struct GetAssignmentGroupsRequest: APIRequestable {
     let include: [Include]
     let perPage: Int?
 
-    init(courseID: String, gradingPeriodID: String? = nil, include: [Include] = [], perPage: Int? = nil) {
+    init(
+        courseID: String,
+        gradingPeriodID: String? = nil,
+        include: [Include] = Include.allCases,
+        perPage: Int? = nil
+    ) {
         self.courseID = courseID
         self.gradingPeriodID = gradingPeriodID
         self.include = include
@@ -64,14 +69,14 @@ public struct GetAssignmentGroupsRequest: APIRequestable {
     }
 
     public var path: String {
-        return "courses/\(courseID)/assignment_groups"
+        "courses/\(courseID)/assignment_groups"
     }
 
     public var query: [APIQueryItem] {
         [
             .include(include.map { $0.rawValue }),
             .perPage(perPage),
-            .optionalValue("grading_period_id", gradingPeriodID),
+            .optionalValue("grading_period_id", gradingPeriodID)
         ]
     }
 }

@@ -19,6 +19,7 @@
 import SwiftUI
 
 public extension InstUI {
+
     struct TextSectionView: View {
         public struct Model: Identifiable, Equatable {
             public var id: String { title + description }
@@ -33,7 +34,9 @@ public extension InstUI {
                 self.isRichContent = isRichContent
             }
         }
-        @Environment(\.sizeCategory) private var sizeCategory
+
+        @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
         private let sectionData: [Model]
 
         public init(
@@ -127,7 +130,7 @@ public extension InstUI {
             title: "Non Rich Content Reference",
             description: "Click here!",
             isRichContent: false
-        ),
+        )
     ])
 }
 
@@ -145,7 +148,7 @@ public extension InstUI {
         .init(
             title: "Description",
             description: "Not added yet..."
-        ),
+        )
     ])
 }
 

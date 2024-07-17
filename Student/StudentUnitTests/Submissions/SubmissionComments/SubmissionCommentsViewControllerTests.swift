@@ -61,7 +61,7 @@ class SubmissionCommentsViewControllerTests: StudentTestCase {
                     author: .make(display_name: "Ron Burgandy", pronouns: nil),
                     comment: "This is a comment",
                     created_at: Clock.now.addDays(-2)
-                ),
+                )
             ],
             submission_type: .online_upload,
             user: .make(short_name: "John Smith", pronouns: "He/Him"),
@@ -76,6 +76,8 @@ class SubmissionCommentsViewControllerTests: StudentTestCase {
         XCTAssertEqual(headerCell(atRow: 1).authorNameLabel?.text, "Jane Doe (She/Her)")
         XCTAssertEqual(headerCell(atRow: 3).authorNameLabel?.text, "Ron Burgandy")
         XCTAssertEqual(headerCell(atRow: 5).authorNameLabel?.text, "John Smith (He/Him)")
+
+        Clock.reset()
     }
 }
 

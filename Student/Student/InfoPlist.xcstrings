@@ -14,7 +14,7 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Canvas Student"
+            "value" : "Estudiant del Canvas"
           }
         },
         "cy" : {
@@ -92,7 +92,7 @@
         "es-ES" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Canvas Student"
+            "value" : "Estudiante de Canvas"
           }
         },
         "fi" : {
@@ -104,13 +104,25 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Canvas Élève"
+            "value" : "Élève Canvas"
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Canvas Étudiant"
+            "value" : "Étudiant Canvas"
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac Léinn Canvas"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
           }
         },
         "ht" : {
@@ -194,7 +206,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Canvas Student"
+            "value" : "Студент Canvas"
           }
         },
         "sl" : {
@@ -224,7 +236,7 @@
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Canvas Student"
+            "value" : "Sinh Viên Canvas"
           }
         },
         "zh" : {
@@ -269,9 +281,261 @@
       "comment" : "Accessibility Bundle Name",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estudiant del Canvas"
+          }
+        },
+        "cy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Myfyriwr Canvas"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas-studerende"
+          }
+        },
+        "da-instk12" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas-elev"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas-Studierende*r"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Canvas Student"
+          }
+        },
+        "en-AU" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "en-AU-unimelb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "en-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "en-CY" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas student"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas student"
+          }
+        },
+        "en-GB-instukhe" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas student"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estudiante de Canvas"
+          }
+        },
+        "es-ES" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estudiante de Canvas"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas-opiskelija"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Élève Canvas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étudiant Canvas"
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac Léinn Canvas"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "ht" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "is" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas nemandi"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Studente Canvas"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas 受講者"
+          }
+        },
+        "mi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Ākonga"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas-student"
+          }
+        },
+        "nb-instk12" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas-elev"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uczestnik Canvas"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aluno Canvas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Студент Canvas"
+          }
+        },
+        "sl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Študent v sistemu Canvas"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas-student"
+          }
+        },
+        "sv-instk12" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas-elev"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinh Viên Canvas"
+          }
+        },
+        "zh" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas 学生"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas 学生"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvas Student"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Canvas Student"
           }
         }
@@ -387,6 +651,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Joindre des photos et des vidéos aux messages et aux publications de discussion ou les joindre dans les envois de tâche."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ceangail grianghraif agus físeáin le teachtaireachtaí agus postálacha fóraim nó cuir isteach iad mar uaslódálacha taisc."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "संदेशों और चर्चा पोस्टों में फ़ोटो और वीडियो संलग्न करें या उन्हें असाइनमेंट सबमिशन के रूप में बदलें।"
           }
         },
         "ht" : {
@@ -641,6 +917,18 @@
             "value" : "Aidez-nous à trouver des écoles près de chez vous."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cabhraigh linn scoileanna in aice leat a aimsiú."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "अपने नज़दीक स्कूल ढूंढने में हमारी मदद करें।"
+          }
+        },
         "ht" : {
           "stringUnit" : {
             "state" : "translated",
@@ -891,6 +1179,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Joindre des enregistrements audio aux messages et aux publications de discussion ou les joindre dans les envois de tâche."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ceangail taifeadtaí fuaime le teachtaireachtaí agus postálacha fóraim nó cuir isteach iad mar uaslódálacha taisc."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "संदेशों और चर्चा पोस्टों में फ़ोटो और ऑडियो रिकॉर्डिंग संलग्न करें या उन्हें असाइनमेंट सबमिशन के रूप में बदलें।"
           }
         },
         "ht" : {
@@ -1145,6 +1445,18 @@
             "value" : "Joindre des photos et des vidéos aux messages et aux publications de discussion ou les joindre dans les envois de tâche."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ceangail grianghraif agus físeáin le teachtaireachtaí agus postálacha fóraim nó cuir isteach iad mar uaslódálacha taisc."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "संदेशों और चर्चा पोस्टों में फ़ोटो और वीडियो संलग्न करें या उन्हें असाइनमेंट सबमिशन के रूप में बदलें।"
+          }
+        },
         "ht" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1395,6 +1707,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Joindre des photos et des vidéos aux messages et aux publications de discussion ou les joindre dans les envois de tâche."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ceangail grianghraif agus físeáin le teachtaireachtaí agus postálacha fóraim nó cuir isteach iad mar uaslódálacha taisc."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "संदेशों और चर्चा पोस्टों में फ़ोटो और वीडियो संलग्न करें या उन्हें असाइनमेंट सबमिशन के रूप में बदलें।"
           }
         },
         "ht" : {

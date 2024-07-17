@@ -22,6 +22,11 @@ import WebKit
 import TestsFoundation
 
 class DiscussionDetailsViewControllerTests: CoreTestCase {
+
+    private enum TestConstants {
+        static let date = DateComponents(calendar: .current, year: 2020, month: 5, day: 7, hour: 8, minute: 35).date!
+    }
+
     let course = Context(.course, id: "1")
     lazy var controller = DiscussionDetailsViewController.create(context: course, topicID: "1", offlineModeInteractor: OfflineModeInteractorMock(mockIsInOfflineMode: false))
 
@@ -67,7 +72,7 @@ class DiscussionDetailsViewControllerTests: CoreTestCase {
         controller.webView = webView
         api.mock(controller.colors, value: .init(custom_colors: [
             "course_1": "#008",
-            "group_1": "#080",
+            "group_1": "#080"
         ]))
         let assignment = APIAssignment.make(points_possible: 95)
         api.mock(GetAssignment(courseID: "1", assignmentID: "1"), value: assignment)
@@ -76,7 +81,7 @@ class DiscussionDetailsViewControllerTests: CoreTestCase {
             participants: [
                 .make(id: 2, display_name: "Bob"),
                 .make(id: 3, display_name: "Ruth"),
-                .make(id: 4, display_name: "Dale"),
+                .make(id: 4, display_name: "Dale")
             ],
             unread_entries: [4],
             forced_entries: [2],
@@ -87,12 +92,12 @@ class DiscussionDetailsViewControllerTests: CoreTestCase {
                 """, replies: [
                     .make(id: 100, user_id: 3, parent_id: 1, deleted: true),
                     .make(id: 2, user_id: 3, parent_id: 1, message: "<link rel=\"stylesheet\"><script src=\"foo.js\"></script><p>I disagree.</p>", replies: [
-                        .make(id: 3, user_id: 2, parent_id: 2, message: "Why?"),
-                    ]),
-                ]),
+                        .make(id: 3, user_id: 2, parent_id: 2, message: "Why?")
+                    ])
+                ])
             ],
             new_entries: [
-                .make(id: 4, user_id: 4, parent_id: 3, message: "Hot Pockets claim to be sandwiches"),
+                .make(id: 4, user_id: 4, parent_id: 3, message: "Hot Pockets claim to be sandwiches")
             ]
         ))
         api.mock(controller.group, value: .make(course_id: 1))
@@ -109,7 +114,7 @@ class DiscussionDetailsViewControllerTests: CoreTestCase {
             is_section_specific: true,
             message: "<p>Is the cube rule of food valid? What's your take?</p>",
             permissions: .make(attach: true, update: true, reply: true, delete: true),
-            posted_at: DateComponents(calendar: .current, year: 2020, month: 5, day: 7, hour: 8, minute: 35).date,
+            posted_at: TestConstants.date,
             published: true,
             sections: [ .make() ],
             sort_by_rating: true,
@@ -134,7 +139,7 @@ class DiscussionDetailsViewControllerTests: CoreTestCase {
         XCTAssertEqual(controller.maxDepth, controller.view.traitCollection.horizontalSizeClass == .compact ? 2 : 4)
         let html = getBodyHTML()
         XCTAssert(html.contains("Instructor (she/her)"))
-        XCTAssert(html.contains("May 7, 2020 at 8:35 AM"))
+        XCTAssert(html.contains(TestConstants.date.dateTimeString))
         XCTAssert(html.contains("Is the cube rule of food valid?"))
         XCTAssert(html.contains("Bob"))
         XCTAssert(html.contains("Oreos are sandwiches."))
@@ -277,7 +282,7 @@ class DiscussionDetailsViewControllerTests: CoreTestCase {
         ))
         api.mock(GetDiscussionView(context: group, topicID: "2"), value: .make(
             participants: [
-                .make(id: 2, display_name: "Bob"),
+                .make(id: 2, display_name: "Bob")
             ],
             unread_entries: [4],
             forced_entries: [2],
@@ -285,7 +290,7 @@ class DiscussionDetailsViewControllerTests: CoreTestCase {
                 .make(id: 1, user_id: 2, message: """
                 <p>Cube rule all the way.</p>
                 <p>Oreos are sandwiches.</p>
-                """),
+                """)
             ]
         ))
         api.mock(GetContextPermissions(context: group, permissions: [ .postToForum ]), value: .make(post_to_forum: true))
@@ -325,7 +330,7 @@ class DiscussionDetailsViewControllerTests: CoreTestCase {
                 .make(id: 1, user_id: 2, message: """
                 <p>Cube rule all the way.</p>
                 <p>Oreos are sandwiches.</p>
-                """),
+                """)
             ]
         ))
         api.mock(controller.topic, value: .make(
@@ -378,7 +383,7 @@ class DiscussionDetailsViewControllerTests: CoreTestCase {
         api.mock(controller.entries, value: .make(
             participants: [
                 .make(id: 2, display_name: "Bob"),
-                .make(id: 3, display_name: "Ruth"),
+                .make(id: 3, display_name: "Ruth")
             ],
             unread_entries: [],
             forced_entries: [2],
@@ -388,9 +393,9 @@ class DiscussionDetailsViewControllerTests: CoreTestCase {
                 <p>Oreos are sandwiches.</p>
                 """, replies: [
                     .make(id: 2, user_id: ID(userID), parent_id: 1, message: "<p>I disagree.</p>", replies: [
-                        .make(id: 3, user_id: 2, parent_id: 2, message: "Why?"),
-                    ]),
-                ]),
+                        .make(id: 3, user_id: 2, parent_id: 2, message: "Why?")
+                    ])
+                ])
             ],
             new_entries: []
         ))

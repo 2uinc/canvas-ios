@@ -26,14 +26,21 @@ class CourseSyncAssignmentsInteractorLiveTests: CoreTestCase {
         let testee = CourseSyncAssignmentsInteractorLive(htmlParser: getHTMLParser())
         let expectation = expectation(description: "Publisher sends value")
 
+        api.mock(GetGradingPeriodsRequest(courseID: "1"), value: [])
+        let assignmentGroupRequest = GetAssignmentGroupsRequest(
+            courseID: "1",
+            gradingPeriodID: nil,
+            perPage: 100
+        )
+
         api.mock(
-            GetAssignmentsByGroup(courseID: "1"),
+            assignmentGroupRequest,
             value: [
                 APIAssignmentGroup.make(
                     assignments: [
-                        .make(),
+                        .make()
                     ]
-                ),
+                )
             ]
         )
         api.mock(
@@ -47,7 +54,7 @@ class CourseSyncAssignmentsInteractorLiveTests: CoreTestCase {
                 id: "1",
                 submission_comments: [
                     .make(id: "1", comment: "First comment"),
-                    .make(id: "2", comment: "Second comment"),
+                    .make(id: "2", comment: "Second comment")
                 ]
             )
         )
@@ -106,15 +113,21 @@ class CourseSyncAssignmentsInteractorLiveTests: CoreTestCase {
     func testSubmissionCommentErrorHandling() {
         let testee = CourseSyncAssignmentsInteractorLive(htmlParser: getHTMLParser())
         let expectation = expectation(description: "Publisher sends value")
+        api.mock(GetGradingPeriodsRequest(courseID: "1"), value: [])
+        let assignmentGroupRequest = GetAssignmentGroupsRequest(
+            courseID: "1",
+            gradingPeriodID: nil,
+            perPage: 100
+        )
 
         api.mock(
-            GetAssignmentsByGroup(courseID: "1"),
+            assignmentGroupRequest,
             value: [
                 APIAssignmentGroup.make(
                     assignments: [
-                        .make(),
+                        .make()
                     ]
-                ),
+                )
             ]
         )
 

@@ -37,7 +37,7 @@ class AddressbookRoleViewModelTests: CoreTestCase {
             router: environment.router,
             recipientContext: .init(course: Course.make()),
             interactor: mockInteractor,
-            recipientDidSelect: selected,
+            didSelectRecipient: selected,
             selectedRecipients: selectedRecipients
         )
     }
@@ -64,13 +64,13 @@ class AddressbookRoleViewModelTests: CoreTestCase {
 
     func testCancelButton() {
         let sourceView = UIViewController()
-        testee.doneButtonDidTap.accept(WeakViewController(sourceView))
+        testee.didTapDone.accept(WeakViewController(sourceView))
         XCTAssertNotNil(router.dismissed)
     }
 
     func testRoleSelection() {
         let sourceView = UIViewController()
-        testee.roleDidTap.send((roleName: "Students", recipients: testee.recipients, controller: WeakViewController(sourceView)))
+        testee.didTapRole.send((roleName: "Students", recipients: testee.recipients, controller: WeakViewController(sourceView)))
         XCTAssertNotNil(router.showExpectation)
     }
 
@@ -108,7 +108,7 @@ private class AddressbookInteractorMock: AddressbookInteractor {
             .save(.make(id: "2", name: "Recipient 2", common_courses: ["Course 1": ["StudentEnrollment"]]), filter: "", in: env.database.viewContext),
             .save(.make(id: "3", name: "Recipient 3", common_courses: ["Course 1": ["ObserverEnrollment"]]), filter: "", in: env.database.viewContext),
             .save(.make(id: "4", name: "Recipient 4", common_courses: ["Course 1": ["TaEnrollment", "DesignerEnrollment"]]), filter: "", in: env.database.viewContext),
-            .save(.make(id: "5", name: "Recipient 5", common_courses: ["Course 1": ["TaEnrollment"]]), filter: "", in: env.database.viewContext),
+            .save(.make(id: "5", name: "Recipient 5", common_courses: ["Course 1": ["TaEnrollment"]]), filter: "", in: env.database.viewContext)
         ])
     }
 

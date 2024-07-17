@@ -51,11 +51,13 @@ class UseCaseTests: CoreTestCase {
 
         Clock.mockNow(now.addingTimeInterval(useCase.ttl + 1))
         XCTAssertTrue(useCase.hasExpired(in: databaseClient))
+
+        Clock.reset()
     }
 
     func testScope() {
         let useCase = TestUseCase()
-        XCTAssertEqual(useCase.scope, Scope.all(orderBy: "id"))
+        XCTAssertEqual(useCase.scope, Scope.all(orderBy: "objectID"))
     }
 
     func testGetNext() {
@@ -272,7 +274,7 @@ class APIUseCaseTests: CoreTestCase {
         let curr = "https://cgnuonline-eniversity.edu/api/v1/date?page=2"
         let next = "https://cgnuonline-eniversity.edu/api/v1/date?page=3"
         let headers = [
-            "Link": "<\(curr)>; rel=\"current\",<>;, <\(prev)>; rel=\"prev\", <\(next)>; rel=\"next\"; count=1",
+            "Link": "<\(curr)>; rel=\"current\",<>;, <\(prev)>; rel=\"prev\", <\(next)>; rel=\"next\"; count=1"
         ]
         let response = HTTPURLResponse(url: URL(string: curr)!, statusCode: 200, httpVersion: "HTTP/1.1", headerFields: headers)!
         XCTAssertEqual(useCase.getNext(from: response)?.path, next)

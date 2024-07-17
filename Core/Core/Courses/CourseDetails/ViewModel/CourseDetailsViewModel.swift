@@ -64,12 +64,6 @@ public class CourseDetailsViewModel: ObservableObject {
         self?.updateTabs()
     }
 
-    // At this point we probably don't have feature flags saved in Core Data so we need to fetch them.
-    // If discussionRedesign is enabled and we are in offline mode, we need to disable the Discussions tab.
-    private lazy var featureFlags = env.subscribe(GetEnabledFeatureFlags(context: .course(courseID))) { [weak self] in
-        self?.updateTabs()
-    }
-
     private var subscriptions = Set<AnyCancellable>()
     private let offlineModeInteractor: OfflineModeInteractor
 
@@ -103,7 +97,6 @@ public class CourseDetailsViewModel: ObservableObject {
         permissions.refresh()
         course.refresh()
         colors.refresh()
-        featureFlags.refresh()
     }
 
     public func retryAfterError() {
@@ -139,14 +132,14 @@ public class CourseDetailsViewModel: ObservableObject {
     }
 
     private func updateCellOfflineSupport(on cells: [CourseDetailsCellViewModel]) {
-        guard var offlineSelectionsForCourse = env.userDefaults?.offlineSyncSelections else {
+        guard let offlineSelectionsForCourse = env.userDefaults?.offlineSyncSelections else {
             return
         }
 
         let wholeCourseSelected = offlineSelectionsForCourse.contains("courses/\(courseID)")
 
         if wholeCourseSelected {
-            var offlineTabs = TabName.OfflineSyncableTabs.map { $0.rawValue }
+            let offlineTabs = TabName.OfflineSyncableTabs.map { $0.rawValue }
 
             cells.forEach {
                 $0.isSupportedOffline = offlineTabs.contains($0.tabID)
@@ -223,10 +216,6 @@ public class CourseDetailsViewModel: ObservableObject {
         updateCellSelectionStates(on: cellViewModels, selectedIndex: selectionViewModel.selectedIndex)
         updateCellOfflineSupport(on: cellViewModels)
         state = .data(cellViewModels)
-    }
-
-    private func isDiscussionRedesignEnabled() -> Bool {
-        EmbeddedWebPageViewModelLive.isRedesignEnabled(in: context)
     }
 
     // MARK: Attendance Tool

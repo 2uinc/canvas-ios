@@ -21,7 +21,6 @@ import SwiftUI
 public struct AssignmentListView: View, ScreenViewTrackable {
     @Environment(\.viewController) private var controller
     @ObservedObject private var viewModel: AssignmentListViewModel
-    @StateObject private var offlineModeViewModel = OfflineModeViewModel(interactor: OfflineModeAssembly.make())
     public let screenViewTrackingParameters: ScreenViewTrackingParameters
 
     @State private var isShowingGradingPeriodPicker = false
@@ -76,7 +75,7 @@ public struct AssignmentListView: View, ScreenViewTrackable {
     @ViewBuilder
     private var gradingPeriodButton: some View {
         if viewModel.selectedGradingPeriod == nil {
-            PrimaryButton(isAvailable: !$offlineModeViewModel.isOffline) {
+            Button {
                 isShowingGradingPeriodPicker = true
             } label: {
                 Text("Filter", bundle: .core)
@@ -135,13 +134,13 @@ public struct AssignmentListView: View, ScreenViewTrackable {
     }
 
     private func assignmentList(_ groups: [AssignmentGroupViewModel]) -> some View {
-        List {
-            ForEach(groups, id: \.id) { assignmentGroup in
-                AssignmentGroupView(viewModel: assignmentGroup)
-                    .listRowBackground(SwiftUI.EmptyView())
+        ScrollView {
+            LazyVStack(pinnedViews: .sectionHeaders) {
+                ForEach(groups, id: \.id) { assignmentGroup in
+                    AssignmentGroupView(viewModel: assignmentGroup)
+                }
             }
         }
-        .listStyle(.plain)
         .refreshable {
             await viewModel.refresh()
         }
@@ -164,7 +163,7 @@ struct AssignmentListView_Previews: PreviewProvider {
             APIAssignment.make(id: "2", quiz_id: "1"),
             APIAssignment.make(id: "3", submission_types: [.discussion_topic]),
             APIAssignment.make(id: "4", submission_types: [.external_tool]),
-            APIAssignment.make(id: "5", locked_for_user: true),
+            APIAssignment.make(id: "5", locked_for_user: true)
         ]
         return assignments.map {
             Assignment.save($0, in: context, updateSubmission: false, updateScoreStatistics: false)
@@ -178,7 +177,7 @@ struct AssignmentListView_Previews: PreviewProvider {
         let assignments = createAssignments()
         let assignmentGroups: [AssignmentGroupViewModel] = [
             AssignmentGroupViewModel(name: "Assignment Group 1", id: "1", assignments: assignments, courseColor: .red),
-            AssignmentGroupViewModel(name: "Assignment Group 2", id: "2", assignments: assignments, courseColor: .red),
+            AssignmentGroupViewModel(name: "Assignment Group 2", id: "2", assignments: assignments, courseColor: .red)
         ]
         let viewModel = AssignmentListViewModel(state: .data(assignmentGroups))
         AssignmentListView(viewModel: viewModel)

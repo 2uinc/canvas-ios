@@ -20,6 +20,11 @@ import Foundation
 
 // https://canvas.instructure.com/doc/api/groups.html#Group
 public struct APIGroup: Codable, Equatable {
+    public enum GroupType {
+        case account
+        case course(courseId: ID)
+    }
+
     public let id: ID
     let name: String
     let concluded: Bool
@@ -38,6 +43,14 @@ public struct APIGroup: Codable, Equatable {
     // let storage_quota_mb: String
     let permissions: Permissions?
     let is_favorite: Bool?
+
+    public var groupType: GroupType {
+        if let course_id {
+            return .course(courseId: course_id)
+        } else {
+            return .account
+        }
+    }
 
     public struct Permissions: Codable, Equatable {
         let create_announcement: Bool
@@ -100,7 +113,7 @@ public struct GetGroupsRequest: APIRequestable {
     public var path: String { "\(context.pathComponent)/groups" }
     public var query: [APIQueryItem] { [
         .include(include.map { $0.rawValue }),
-        .perPage(100),
+        .perPage(100)
     ] }
 
     public init(context: Context, include: [Include] = Self.Include.allCases) {
@@ -132,8 +145,8 @@ struct GetGroupUsersRequest: APIRequestable {
 
     public let query: [APIQueryItem] = [
         .array("include", [
-            "avatar_url",
-        ]),
+            "avatar_url"
+        ])
     ]
 }
 
