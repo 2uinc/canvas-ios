@@ -27,8 +27,11 @@ public struct InboxCoursePickerView: View {
 
     public var body: some View {
         ScrollView {
+            let titleText = viewModel.groups.isEmpty
+            ? Text("Select a Course", bundle: .core)
+            : Text("Select a Course or a Group", bundle: .core)
             content
-                .navigationTitleStyled(Text("Select Team", bundle: .core).font(.semibold17).foregroundColor(.textDarkest))
+                .navigationTitleStyled(titleText.font(.semibold17).foregroundColor(.textDarkest))
                 .navigationBarTitleDisplayMode(.inline)
         }
         .refreshable {
@@ -71,7 +74,6 @@ public struct InboxCoursePickerView: View {
             if !courses.isEmpty {
                 Section(header:
                         VStack(spacing: 0) {
-                    separator
                     Text("Courses", bundle: .core)
                         .font(.regular14)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -123,18 +125,6 @@ public struct InboxCoursePickerView: View {
 
     private func isSelected(_ group: Group) -> Bool {
         viewModel.selectedRecipientContext?.context.id == group.id && viewModel.selectedRecipientContext?.context.contextType == .group
-    }
-
-    private func headerView(_ header: String) -> some View {
-        VStack(spacing: 0) {
-            Text(header)
-                .font(.regular14)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .foregroundStyle(Color.textDark)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 16)
-                .background(Color.backgroundLight)
-        }
     }
 
     private func courseRow(_ course: Course) -> some View {
