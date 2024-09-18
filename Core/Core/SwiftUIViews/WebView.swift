@@ -19,6 +19,7 @@
 import Combine
 import SwiftUI
 import WebKit
+import SafariServices
 
 public struct WebView: UIViewRepresentable {
     private var handleLink: ((URL) -> Bool)?
@@ -235,6 +236,20 @@ extension WebView {
         guard let webView = uiView.subviews.first as? WKWebView else { return }
         coordinator.clearWKEvents(in: webView)
         print("!!! dismantle")
+    }
+}
+
+extension WebView.Coordinator: UIWebViewDelegate {
+    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        if navigationAction.targetFrame == nil,
+            let url = navigationAction.request.url,
+            let top = AppEnvironment.shared.window?.rootViewController?.topMostViewController() {
+            let controller = SFSafariViewController(url: url)
+            controller.modalPresentationStyle = .pageSheet
+            top.present(controller, animated: true)
+        }
+        print("WebView createWebViewWith")
+        return nil
     }
 }
 

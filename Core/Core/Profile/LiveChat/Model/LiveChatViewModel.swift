@@ -186,7 +186,7 @@ class LiveChatViewModel: ObservableObject {
                         "configId": "###CONFIGID###",
                         "headless": true,
                         "startOpen": true,
-                        "allowAttachments": false,
+                        "allowAttachments": true,
                         "allowPopout": false,
                         "hideMinimize": true,
                         "miniForm": true,
