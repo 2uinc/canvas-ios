@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import XpertFive9Chat
 
 struct SideMenuBottomSection: View {
     @Environment(\.appEnvironment) var env
@@ -211,7 +212,15 @@ struct SideMenuBottomSection: View {
 
     private func showLiveChat() {
         if offlineModeViewModel.reachability.isConnected {
-            route(to: "/profile/chat", options: .modal(.formSheet, embedInNav: true, addDoneButton: true))
+            env.router.dismiss(self.controller) {
+                let config = XpertChatConfiguration(
+                    xpertKey: RemoteConfigManager.shared.xpertKey,
+                    useCase: "['Canvas_Student', 'All_Users']",
+                    segmentKey: RemoteConfigManager.shared.segmentKey,
+                    baseURL: AppEnvironment.shared.currentSession?.baseURL
+                )
+                XpertFive9Chat.show(xpertConfig: config, animated: true)
+            }
         } else {
             UIAlertController.showItemNotAvailableInOfflineAlert()
         }

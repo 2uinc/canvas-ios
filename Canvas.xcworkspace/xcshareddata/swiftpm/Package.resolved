@@ -1,5 +1,5 @@
 {
-  "originHash" : "86b76870a226968e740f43749faf5ff3dfe72ee9eebe6c2d22cc49b749b3c809",
+  "originHash" : "5a3b168e7b50f57527bcdddf769166e8819ce412f36aca3e2591d08729d6fc87",
   "pins" : [
     {
       "identity" : "aws-sdk-ios-spm",
@@ -143,6 +143,15 @@
       "state" : {
         "revision" : "50843cbb8551db836adec2290bb4bc6bac5c1865",
         "version" : "0.9.0"
+      }
+    },
+    {
+      "identity" : "xpertfive9chat",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rnr/XpertFive9Chat",
+      "state" : {
+        "branch" : "UI-fixes",
+        "revision" : "71d39a6b8d7f26596f6cb19d9eb04ad0772eb1c8"
       }
     }
   ],

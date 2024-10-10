@@ -41,6 +41,9 @@ packages:
   Swifter:
     url: https://github.com/httpswift/swifter
     version: 1.5.0
+  XpertFive9Chat:
+    url: https://github.com/rnr/XpertFive9Chat
+    branch: UI-fixes
 targets:
   Core:    
     type: framework
@@ -55,6 +58,7 @@ targets:
       - package: CombineReachability
       - package: mobile-offline-downloader-ios
       - package: SwiftUIIntrospect
+      - package: XpertFive9Chat
     preBuildScripts:
       - path: ../scripts/swiftLint.sh
         name: SwiftLint
