@@ -21,11 +21,12 @@ import UIKit
 import Core
 
 class SpeedGraderViewController: ScreenViewTrackableViewController, PagesViewControllerDataSource {
+    internal static let AllUsersUserID = "speedgrader"
     typealias Page = CoreHostingController<SubmissionGrader>
 
     let assignmentID: String
     let context: Context
-    let env = AppEnvironment.shared
+    var env: AppEnvironment = .defaultValue
     let filter: [GetSubmissions.Filter]
     var initialIndex: Int?
     let userID: String?
@@ -44,11 +45,12 @@ class SpeedGraderViewController: ScreenViewTrackableViewController, PagesViewCon
         self?.update()
     }
 
-    init(context: Context, assignmentID: String, userID: String, filter: [GetSubmissions.Filter]) {
+    init(env: AppEnvironment, context: Context, assignmentID: String, userID: String, filter: [GetSubmissions.Filter]) {
+        self.env = env
         self.assignmentID = assignmentID
         self.context = context
         self.filter = filter
-        self.userID = userID == "speedgrader" ? nil : userID
+        self.userID = userID == Self.AllUsersUserID ? nil : userID
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -117,6 +119,12 @@ class SpeedGraderViewController: ScreenViewTrackableViewController, PagesViewCon
         }
 
         updatePages()
+
+        // SpeedGrader is by design not embedded into a navigation controller.
+        // However, when navigating to this screen from CoreWebView's link handler
+        // it automatically wraps it into a navigation controller and adds a Done button.
+        // To avoid displaying double Close/Done buttons and an extra navigation bar hide it.
+        navigationController?.setNavigationBarHidden(true, animated: true)
     }
 
     var isLoading: Bool {
@@ -133,7 +141,8 @@ class SpeedGraderViewController: ScreenViewTrackableViewController, PagesViewCon
         ProgressView()
             .progressViewStyle(.indeterminateCircle())
             .accessibility(label: Text("Loading", bundle: .teacher))
-            .identifier("SpeedGrader.spinner")
+            .identifier("SpeedGrader.spinner"),
+        env: env
     )
 
     lazy var emptyView: UIViewController = CoreHostingController(
@@ -166,7 +175,7 @@ class SpeedGraderViewController: ScreenViewTrackableViewController, PagesViewCon
     }
 
     func controller(for index: Int) -> UIViewController? {
-        let controller = grader(for: index).map { CoreHostingController($0) }
+        let controller = grader(for: index).map { CoreHostingController($0, env: env) }
         controller?.view.backgroundColor = nil
         return controller
     }
@@ -174,6 +183,7 @@ class SpeedGraderViewController: ScreenViewTrackableViewController, PagesViewCon
     func grader(for index: Int) -> SubmissionGrader? {
         guard index >= 0, index < submissions.all.count, let assignment = assignment.first else { return nil }
         return SubmissionGrader(
+            env: env,
             index: index,
             assignment: assignment,
             submission: submissions.all[index],
@@ -189,5 +199,14 @@ class SpeedGraderViewController: ScreenViewTrackableViewController, PagesViewCon
                 page.rootView.content = grader
             }
         }
+    }
+
+    /// Helper function to help normalize user ids coming from webview urls
+    static func normalizeUserID(_ userID: String?) -> String {
+        if let userID, userID.containsOnlyNumbers {
+            return userID
+        }
+
+        return SpeedGraderViewController.AllUsersUserID
     }
 }

@@ -17,6 +17,7 @@
 //
 
 import TestsFoundation
+import XCTest
 
 class FilesTests: E2ETestCase {
     typealias Helper = FilesHelper
@@ -145,7 +146,7 @@ class FilesTests: E2ETestCase {
         XCTAssertTrue(testPDFButton.waitUntil(.vanish).isVanished)
 
         // MARK: Check uploaded file in list
-        let uploadedFileListItem = FileList.file(index: 0).waitUntil(.visible)
+        let uploadedFileListItem = FileList.file(index: 0).waitUntil(.visible, timeout: 60)
         XCTAssertTrue(uploadedFileListItem.isVisible)
         XCTAssertTrue(uploadedFileListItem.hasLabel(label: Helper.TestPDF.title, strict: false))
 

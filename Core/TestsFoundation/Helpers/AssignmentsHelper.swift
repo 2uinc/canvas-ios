@@ -17,14 +17,16 @@
 //
 
 import Core
+import Foundation
+import XCTest
 
 public class AssignmentsHelper: BaseHelper {
     public static func navBar(course: DSCourse) -> XCUIElement {
-        return app.find(id: "Assignments, \(course.name)")
+        return app.find(label: "Assignments, \(course.name)", type: .staticText)
     }
 
-    public static func assignmentButton(assignment: DSAssignment? = nil, assignmentId: String? = nil) -> XCUIElement {
-        return app.find(id: "assignment-list.assignment-list-row.cell-\(assignment?.id ?? assignmentId!)")
+    public static func assignmentButton(assignment: DSAssignment) -> XCUIElement {
+        return app.find(id: "AssignmentList.\(assignment.id)")
     }
 
     public static func pointsOutOf(actualScore: String, maxScore: String) -> XCUIElement {
@@ -36,7 +38,7 @@ public class AssignmentsHelper: BaseHelper {
     }
 
     public static func oneNeedsGradingLabel(assignmentItem: XCUIElement) -> XCUIElement {
-        return assignmentItem.find(label: "1 NEEDS GRADING", type: .staticText)
+        return assignmentItem.find(label: "1 Needs Grading", type: .staticText)
     }
 
     public struct SpeedGrader {
@@ -99,7 +101,7 @@ public class AssignmentsHelper: BaseHelper {
 
         // Other
         public static var backButton: XCUIElement {
-            app.find(idStartingWith: "Assignment Details", type: .navigationBar).find(label: "Back", type: .button)
+            return app.find(type: .navigationBar).find(label: "Back", type: .button)
         }
 
         public static func navBar(course: DSCourse) -> XCUIElement {
@@ -118,9 +120,10 @@ public class AssignmentsHelper: BaseHelper {
         }
 
         public struct SubmissionDetails {
-            public static var attemptPickerToggle: XCUIElement { app.find(id: "SubmissionDetails.attemptPickerToggle") }
             public static var attemptPicker: XCUIElement { app.find(id: "SubmissionDetails.attemptPicker") }
-            public static var pickerWheel: XCUIElement { attemptPicker.find(type: .pickerWheel) }
+            public static var attemptPickerItems: [XCUIElement] {
+                app.findAll(idStartingWith: "SubmissionDetails.attemptPickerItem.")
+            }
             public static var drawerGripper: XCUIElement { app.find(id: "SubmissionDetails.drawerGripper") }
         }
 
@@ -212,7 +215,7 @@ public class AssignmentsHelper: BaseHelper {
         // Teacher
         public struct Submissions {
             public static var needsGradingLabel: XCUIElement { app.find(id: "Needs Grading") }
-            public static var backButton: XCUIElement { app.find(labelContaining: "Assignment Details, ", type: .button) }
+            public static var backButton: XCUIElement { app.find(label: "Back", type: .button) }
 
             public static func cell(student: DSUser) -> XCUIElement {
                 return app.find(id: "SubmissionListCell.\(student.id)")
@@ -237,6 +240,7 @@ public class AssignmentsHelper: BaseHelper {
         public static var cancelButton: XCUIElement { app.find(id: "screen.dismiss") }
         public static var submitButton: XCUIElement { app.find(id: "TextSubmission.submitButton") }
         public static var textField: XCUIElement { app.find(id: "RichContentEditor.webView").find(type: .textField) }
+        public static var textView: XCUIElement { app.find(label: "Submission text", type: .textView) }
 
         public static var pandaFilePicker: XCUIElement { app.find(id: "PandaFilePicker") }
         public static var filesButton: XCUIElement { app.find(id: "FilePicker.filesButton") }
@@ -301,7 +305,8 @@ public class AssignmentsHelper: BaseHelper {
         PhotosAppHelper.selectAssignment(assignment: assignment)
         PhotosAppHelper.tapSubmitButton()
 
-        let result = PhotosAppHelper.photosApp.staticTexts["Submission Success!"].waitForExistence(timeout: 50)
+        let successMessage = PhotosAppHelper.photosApp.descendants(matching: .staticText).matching(label: "Submission Success!").firstMatch
+        let result = successMessage.waitForExistence(timeout: 50)
         if result {
             PhotosAppHelper.tapDoneButton()
             PhotosAppHelper.closeApp()

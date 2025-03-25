@@ -17,6 +17,7 @@
 //
 
 import TestsFoundation
+import XCTest
 
 class InboxTests: E2ETestCase {
     typealias Helper = InboxHelper
@@ -220,7 +221,7 @@ class InboxTests: E2ETestCase {
         XCTAssertTrue(dateLabel.isVisible)
         XCTAssertTrue(bodyLabel.isVisible)
         XCTAssertTrue(subjectLabel.isVisible)
-        XCTAssertTrue(bodyLabel.hasLabel(label: conversation.last_authored_message))
+        XCTAssertTrue(bodyLabel.hasValue(value: conversation.last_authored_message))
         XCTAssertTrue(subjectLabel.hasLabel(label: conversation.subject))
 
         // MARK: Check "More options"

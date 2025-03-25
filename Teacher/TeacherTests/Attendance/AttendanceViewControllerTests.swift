@@ -25,6 +25,7 @@ class AttendanceViewControllerTests: TeacherTestCase {
     let context = Context(.course, id: "1")
     var controller: AttendanceViewController!
     var navigation: UINavigationController!
+    let courseColor = "#008EE2"
 
     override func setUp() {
         super.setUp()
@@ -38,7 +39,7 @@ class AttendanceViewControllerTests: TeacherTestCase {
         navigation = UINavigationController(rootViewController: controller)
 
         api.mock(GetCustomColorsRequest(), value: APICustomColors(custom_colors: [
-            context.canvasContextID: "#008EE2" // electric
+            context.canvasContextID: courseColor
         ]))
         api.mock(GetCourseRequest(courseID: context.id), value: .make())
         api.mock(GetCourseSectionsRequest(courseID: context.id, perPage: 100), value: [
@@ -66,7 +67,10 @@ class AttendanceViewControllerTests: TeacherTestCase {
 
     func testStatusDisplay() {
         loadView()
-        XCTAssertEqual(controller.navigationController?.navigationBar.barTintColor?.hexString, UIColor(hexString: "#008EE2")!.ensureContrast(against: .backgroundLightest).hexString)
+        XCTAssertEqual(
+            controller.navigationController?.navigationBar.barTintColor?.hexString,
+            UIColor(hexString: courseColor)!.variantForLightMode.darkenToEnsureContrast(against: .textLightest.variantForLightMode).hexString
+        )
         XCTAssertEqual(controller.view.backgroundColor, .backgroundLightest)
         XCTAssertEqual(controller.tableView.refreshControl?.isRefreshing, true)
         RunLoop.main.run(until: Date() + 1)
@@ -89,7 +93,7 @@ class AttendanceViewControllerTests: TeacherTestCase {
         let swipes = controller.tableView(controller.tableView, trailingSwipeActionsConfigurationForRowAt: first)?.actions
         XCTAssertEqual(swipes?.count, 3)
         swipes?.last?.handler(swipes!.last!, UIView()) { success in XCTAssertTrue(success) }
-        XCTAssertEqual(cellAt(first).accessibilityLabel, "Bob")
+        XCTAssertEqual(cellAt(first).accessibilityLabel, "Bob — Unmarked")
         XCTAssertEqual(controller.markAllButton.title(for: .normal), "Mark Remaining as Present")
 
         // Use taps to mark row 2
@@ -98,7 +102,7 @@ class AttendanceViewControllerTests: TeacherTestCase {
         controller.tableView(controller.tableView, didSelectRowAt: second)
         XCTAssertEqual(cellAt(second).accessibilityLabel, "Sally — Late")
         controller.tableView(controller.tableView, didSelectRowAt: second)
-        XCTAssertEqual(cellAt(second).accessibilityLabel, "Sally")
+        XCTAssertEqual(cellAt(second).accessibilityLabel, "Sally — Unmarked")
         XCTAssertEqual(controller.markAllButton.title(for: .normal), "Mark All as Present")
         controller.tableView(controller.tableView, didSelectRowAt: second)
         XCTAssertEqual(cellAt(second).accessibilityLabel, "Sally — Present")

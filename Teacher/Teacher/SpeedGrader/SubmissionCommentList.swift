@@ -23,7 +23,7 @@ import Combine
 struct SubmissionCommentList: View {
     let assignment: Assignment
     let submission: Submission
-    let filePicker = FilePicker()
+    let filePicker = FilePicker(env: .shared)
     @Binding var attempt: Int?
     @Binding var fileID: String?
     @Binding var showRecorder: MediaCommentType?
@@ -40,6 +40,8 @@ struct SubmissionCommentList: View {
     @State var showMediaOptions = false
     @State var showCommentLibrary = false
 
+    @AccessibilityFocusState private var focusedTab: SubmissionGrader.GraderTab?
+
     init(
         assignment: Assignment,
         submission: Submission,
@@ -48,7 +50,8 @@ struct SubmissionCommentList: View {
         fileID: Binding<String?>,
         showRecorder: Binding<MediaCommentType?>,
         enteredComment: Binding<String>,
-        commentLibrary: SubmissionCommentLibraryViewModel
+        commentLibrary: SubmissionCommentLibraryViewModel,
+        focusedTab: AccessibilityFocusState<SubmissionGrader.GraderTab?>
     ) {
         self.assignment = assignment
         self.submission = submission
@@ -58,6 +61,7 @@ struct SubmissionCommentList: View {
         self._comment = enteredComment
         self.attempts = attempts
         self.commentLibrary = commentLibrary
+        self._focusedTab = focusedTab
 
         _viewModel = StateObject(wrappedValue: SubmissionCommentListViewModel(
             attempt: attempt.wrappedValue,
@@ -103,16 +107,6 @@ struct SubmissionCommentList: View {
                 case nil:
                     toolbar(containerHeight: geometry.size.height)
                         .transition(.opacity)
-                        .onTapGesture {
-                            showCommentLibrary = commentLibrary.shouldShow
-                        }
-                        .accessibilityAction(named: Text("Open comment library", bundle: .teacher)) {
-                            if commentLibrary.shouldShow {
-                                showCommentLibrary = true
-                            } else {
-                                UIAccessibility.post(notification: .screenChanged, argument: String(localized: "Comment library is not available", bundle: .teacher))
-                            }
-                        }
                 }
             }.sheet(isPresented: $showCommentLibrary) {
                 CommentLibrarySheet(viewModel: commentLibrary, comment: $comment) {
@@ -131,13 +125,21 @@ struct SubmissionCommentList: View {
         ForEach(comments, id: \.id) { comment in
             SubmissionCommentListCell(
                 assignment: assignment,
-                submission: attempts.first(where: { $0.attempt == comment.attempt }) ?? submission,
+                submission: submissionForComment(comment),
                 comment: comment,
                 attempt: $attempt,
                 fileID: $fileID
             )
                 .scaleEffect(y: -1)
         }
+    }
+
+    private func submissionForComment(_ comment: SubmissionComment) -> Submission {
+        let result = attempts.first(where: { $0.attempt == comment.attempt }) ?? submission
+        if result.assignment == nil {
+            result.assignment = assignment
+        }
+        return result
     }
 
     func toolbar(containerHeight: CGFloat) -> some View {
@@ -157,8 +159,15 @@ struct SubmissionCommentList: View {
                         .cancel()
                     ])
                 }
-            CommentEditor(text: $comment, action: sendComment, containerHeight: containerHeight)
+            CommentEditor(
+                text: $comment,
+                shouldShowCommentLibrary: commentLibrary.shouldShow,
+                showCommentLibrary: $showCommentLibrary,
+                action: sendComment,
+                containerHeight: containerHeight
+            )
                 .padding(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 16))
+                .accessibilityFocused($focusedTab, equals: .comments)
         }
             .background(Color.backgroundLight)
     }
@@ -175,6 +184,7 @@ struct SubmissionCommentList: View {
             commentAttempt = nil
         }
         CreateTextComment(
+            env: env,
             courseID: assignment.courseID,
             assignmentID: assignment.id,
             userID: submission.userID,
@@ -183,8 +193,12 @@ struct SubmissionCommentList: View {
             attempt: commentAttempt
         ).fetch { comment, error in
             if error != nil || comment == nil {
+                let genericErrorMessage = String(localized: "Could not save the comment.", bundle: .teacher)
                 self.comment = text
-                self.error = error.map { Text($0.localizedDescription) } ?? Text("Could not save the comment.", bundle: .teacher)
+                self.error = error.map { Text($0.localizedDescription) } ?? Text(genericErrorMessage)
+                UIAccessibility.announce(genericErrorMessage)
+            } else {
+                UIAccessibility.announce(String(localized: "Comment sent successfully", bundle: .teacher))
             }
         }
     }
@@ -224,6 +238,7 @@ struct SubmissionCommentList: View {
             commentAttempt = nil
         }
         UploadMediaComment(
+            env: env,
             courseID: assignment.courseID,
             assignmentID: assignment.id,
             userID: submission.userID,
@@ -239,6 +254,7 @@ struct SubmissionCommentList: View {
     }
 
     func chooseFile() {
+        filePicker.env = env
         filePicker.pickAttachments(from: controller) {
             sendFileComment(batchID: $0)
         }
@@ -252,6 +268,7 @@ struct SubmissionCommentList: View {
             commentAttempt = nil
         }
         UploadFileComment(
+            env: env,
             courseID: assignment.courseID,
             assignmentID: assignment.id,
             userID: submission.userID,

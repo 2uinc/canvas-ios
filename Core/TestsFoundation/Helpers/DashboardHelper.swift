@@ -16,6 +16,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
+import XCTest
+
 public class DashboardHelper: BaseHelper {
     public static var dashboardSettings: XCUIElement { app.find(id: "Dashboard.settingsButton", type: .other) }
     public static var optionsButton: XCUIElement { app.find(label: "Dashboard Options", type: .button) }
@@ -28,7 +30,7 @@ public class DashboardHelper: BaseHelper {
     public static var favoriteButton: XCUIElement { app.find(label: "Favorite", type: .button) }
     public static var noCoursesLabel: XCUIElement { app.find(label: "No Courses") }
     public static var dashboardSettingsShowGradeToggle: XCUIElement {
-        app.find(id: "DashboardSettings.showGradesToggle", type: .switch).find(type: .switch)
+        app.find(id: "DashboardSettings.showGradesToggle", type: .toggle)
     }
 
     public static func courseCard(course: DSCourse? = nil, courseId: String? = nil) -> XCUIElement {
@@ -54,7 +56,7 @@ public class DashboardHelper: BaseHelper {
     public static func turnOnShowGrades() {
         optionsButton.hit()
         dashboardSettingsButton.hit()
-        dashboardSettingsShowGradeToggle.forceTap()
+        dashboardSettingsShowGradeToggle.tap()
         doneButton.hit()
     }
 
@@ -88,10 +90,14 @@ public class DashboardHelper: BaseHelper {
             public static var alertSyncOfflineContentLabel: XCUIElement { app.find(label: "Sync Offline Content?", type: .staticText) }
             public static var notAvailableOfflineLabel: XCUIElement { app.find(labelContaining: "not available offline", type: .staticText) }
 
-            // Syncing offline content
-            public static var syncingOfflineContentLabel: XCUIElement { app.find(label: "Syncing Offline Content") }
+            // No Internet Connection Alert
+            public static var offlineModeAlert: XCUIElement { app.find(label: "Offline mode", type: .alert) }
+            public static var offlineModeAlertTitleText: XCUIElement { offlineModeAlert.find(label: "Offline mode", type: .staticText) }
+            public static var offlineModeAlertMessageText: XCUIElement { offlineModeAlert.find(label: "This item is not available offline.", type: .staticText) }
+            public static var offlineModeAlertOkButton: XCUIElement { offlineModeAlert.find(label: "OK", type: .button) }
 
             // Course content selection
+            public static var assignmentsButton: XCUIElement { app.find(label: "Assignments", type: .staticText) }
             public static var discussionsButton: XCUIElement { app.find(label: "Discussions", type: .staticText) }
             public static var gradesButton: XCUIElement { app.find(label: "Grades", type: .staticText) }
             public static var peopleButton: XCUIElement { app.find(label: "People", type: .staticText) }
@@ -137,21 +143,18 @@ public class DashboardHelper: BaseHelper {
 
         public struct CustomizeCourse {
             public enum CourseColor: String, CaseIterable {
-                case brick = "Brick"
-                case red = "Red"
-                case magenta = "Magenta"
-                case purple = "Purple"
-                case deepPurple = "Deep Purple"
-                case indigo = "Indigo"
-                case blue = "Blue"
-                case lightBlue = "Light Blue"
-                case cyan = "Cyan"
-                case teal = "Teal"
-                case green = "Green"
-                case olive = "Olive"
-                case pumpkin = "Pumpkin"
-                case orange = "Orange"
-                case pink = "Pink"
+                case plum = "Plum"
+                case fuchsia = "Fuchsia"
+                case violet = "Violet"
+                case ocean = "Ocean"
+                case sky = "Sky"
+                case sea = "Sea"
+                case aurora = "Aurora"
+                case forest = "Forest"
+                case honey = "Honey"
+                case copper = "Copper"
+                case rose = "Rose"
+                case stone = "Stone"
             }
 
             public static var nicknameTextField: XCUIElement { app.find(label: "Nickname", type: .textField) }

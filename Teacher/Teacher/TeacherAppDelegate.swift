@@ -58,8 +58,7 @@ class TeacherAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotification
         PushNotificationsInteractor.shared.notificationCenter.delegate = self
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
         UITableView.setupDefaultSectionHeaderTopPadding()
-        FontAppearance.update()
-        TabBarBadgeCounts.application = UIApplication.shared
+        Appearance.update()
 
         if let session = LoginSession.mostRecent {
             window?.rootViewController = LoadingViewController.create()
@@ -68,7 +67,7 @@ class TeacherAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotification
         } else {
             window?.rootViewController = LoginNavigationController.create(loginDelegate: self, fromLaunch: true, app: .teacher)
             window?.makeKeyAndVisible()
-            Analytics.shared.logScreenView(route: "/login", viewController: window?.rootViewController)
+            RemoteLogger.shared.logBreadcrumb(route: "/login", viewController: window?.rootViewController)
         }
 
         handleLaunchOptionsNotifications(launchOptions)
@@ -100,7 +99,7 @@ class TeacherAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotification
 
             self.updateInterfaceStyle(for: self.window)
             CoreWebView.keepCookieAlive(for: self.environment)
-            PushNotificationsInteractor.shared.userDidLogin(loginSession: session)
+            PushNotificationsInteractor.shared.userDidLogin(api: self.environment.api)
 
             self.isK5User = apiProfile.k5_user == true
             Analytics.shared.logSession(session)
@@ -109,13 +108,13 @@ class TeacherAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotification
                 ReactiveStore(useCase: GetBrandVariables())
                     .getEntities()
                     .receive(on: RunLoop.main)
-                    .sink(receiveCompletion: { _ in }) { brandVars in
+                    .replaceError(with: [])
+                    .sink { [weak self] brandVars in
                         brandVars.first?.applyBrandTheme()
+                        self?.setTabBarController()
                     }
                     .store(in: &self.subscriptions)
             }
-
-            self.setTabBarController()
         }}
     }
 
@@ -245,18 +244,19 @@ extension TeacherAppDelegate {
     }
 }
 
+// MARK: - Usage Analytics
+
 extension TeacherAppDelegate: AnalyticsHandler {
 
-    func handleScreenView(screenName: String, screenClass: String, application: String) {
-        Firebase.Crashlytics.crashlytics().log("\(screenName) (\(screenClass))")
-    }
-
-    func handleError(_ name: String, reason: String) {
-        let model = ExceptionModel(name: name, reason: reason)
-        Firebase.Crashlytics.crashlytics().record(exceptionModel: model)
-    }
-
     func handleEvent(_ name: String, parameters: [String: Any]?) {
+        if Heap.isTrackingEnabled() {
+            Heap.track(name, withProperties: parameters)
+        }
+
+        PageViewEventController.instance.logPageView(
+            name,
+            attributes: parameters
+        )
     }
 
     private func initializeTracking() {
@@ -283,7 +283,7 @@ extension TeacherAppDelegate: AnalyticsHandler {
 
 extension TeacherAppDelegate: LoginDelegate {
     func changeUser() {
-        guard let window = window, !(window.rootViewController is LoginNavigationController) else { return }
+        guard let window = window, window.isShowingLoginStartViewController == false else { return }
         disableTracking()
         LoginViewModel().showLoginView(on: window, loginDelegate: self, app: .teacher)
     }
@@ -389,6 +389,7 @@ extension TeacherAppDelegate: LoginDelegate {
 }
 
 // MARK: Error Handling
+
 extension TeacherAppDelegate {
     func setupDefaultErrorHandling() {
         environment.errorHandler = { error, controller in performUIUpdate {
@@ -402,6 +403,7 @@ extension TeacherAppDelegate {
 }
 
 // MARK: Crashlytics
+
 extension TeacherAppDelegate {
     @objc func setupFirebase() {
         guard !testing else { return }
@@ -410,18 +412,32 @@ extension TeacherAppDelegate {
             FirebaseApp.configure()
             configureRemoteConfig()
             Core.Analytics.shared.handler = self
+            RemoteLogger.shared.handler = self
         }
     }
 }
 
+extension TeacherAppDelegate: RemoteLogHandler {
+
+    func handleBreadcrumb(_ name: String) {
+        Firebase.Crashlytics.crashlytics().log(name)
+    }
+
+    func handleError(_ name: String, reason: String) {
+        let model = ExceptionModel(name: name, reason: reason)
+        Firebase.Crashlytics.crashlytics().record(exceptionModel: model)
+    }
+}
+
 // MARK: Launching URLS
+
 extension TeacherAppDelegate {
     @objc @discardableResult func openURL(_ url: URL, userInfo: [String: Any]? = nil) -> Bool {
         if LoginSession.mostRecent == nil, let host = url.host {
             let loginNav = LoginNavigationController.create(loginDelegate: self, app: .teacher)
             loginNav.login(host: host)
             window?.rootViewController = loginNav
-            Analytics.shared.logScreenView(route: "/login", viewController: window?.rootViewController)
+            RemoteLogger.shared.logBreadcrumb(route: "/login", viewController: window?.rootViewController)
         }
 
         let tabRoutes = [["/", "", "/courses", "/groups"], ["/to-do"], ["/conversations", "/inbox"]]

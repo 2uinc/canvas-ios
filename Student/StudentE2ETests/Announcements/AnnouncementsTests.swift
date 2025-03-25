@@ -17,6 +17,7 @@
 //
 
 import TestsFoundation
+import XCTest
 
 class AnnouncementsTests: E2ETestCase {
     typealias Helper = AnnouncementsHelper
@@ -69,13 +70,16 @@ class AnnouncementsTests: E2ETestCase {
         // MARK: Check visibility toggle and dismiss button of the announcement notificaiton
         let toggleButton = AccountNotifications.toggleButton(notification: globalAnnouncement).waitUntil(.visible)
         XCTAssertTrue(toggleButton.isVisible)
+        XCTAssertEqual(toggleButton.label, "\(globalAnnouncement.subject), Tap to view announcement")
         var dismissButton = AccountNotifications.dismissButton(notification: globalAnnouncement).waitUntil(.vanish)
         XCTAssertTrue(dismissButton.isVanished)
 
         // MARK: Tap the toggle button and check visibility of dismiss button again
         toggleButton.hit()
         dismissButton = dismissButton.waitUntil(.visible)
+        XCTAssertEqual(toggleButton.label, "Hide content for \(globalAnnouncement.subject)")
         XCTAssertTrue(dismissButton.isVisible)
+        XCTAssertEqual(dismissButton.label, "Dismiss \(globalAnnouncement.subject)")
 
         // MARK: Check the message of the announcement
         let announcementMessage = Helper.notificationMessage(announcement: globalAnnouncement).waitUntil(.visible)
@@ -111,24 +115,23 @@ class AnnouncementsTests: E2ETestCase {
         announcementsButton.hit()
         let searchField = NewDiscussion.searchField.waitUntil(.visible)
         let filterByLabel = NewDiscussion.filterByLabel.waitUntil(.visible)
-        let sortButton = NewDiscussion.sortButton.waitUntil(.visible)
+        let sortButton = NewDiscussion.sort.waitUntil(.visible)
         let viewSplitScreenButton = NewDiscussion.viewSplitScreenButton.waitUntil(.visible)
         let subscribeButton = NewDiscussion.subscribeButton.waitUntil(.visible)
         let manageDiscussionButton = NewDiscussion.manageDiscussionButton.waitUntil(.visible)
         let announcementTitle = NewDiscussion.discussionTitle(discussion: announcement).waitUntil(.visible)
         let announcementBody = NewDiscussion.discussionBody(discussion: announcement).waitUntil(.visible)
-        let replyButton = NewDiscussion.replyButton.waitUntil(.vanish)
+        let replyButton = NewDiscussion.replyButton.waitUntil(.visible)
         XCTAssertTrue(searchField.isVisible)
-        XCTAssertTrue(searchField.hasValue(value: "Search entries or author..."))
         XCTAssertTrue(filterByLabel.isVisible)
         XCTAssertTrue(sortButton.isVisible)
-        XCTAssertTrue(sortButton.hasLabel(label: "Sorted by Descending", strict: false))
+        XCTAssertTrue(sortButton.hasValue(value: "Newest First", strict: false))
         XCTAssertTrue(viewSplitScreenButton.isVisible)
         XCTAssertTrue(subscribeButton.isVisible)
         XCTAssertTrue(manageDiscussionButton.isVisible)
         XCTAssertTrue(announcementTitle.isVisible)
         XCTAssertTrue(announcementBody.isVisible)
-        XCTAssertTrue(replyButton.isVanished)
+        XCTAssertTrue(replyButton.isVisible)
 
         viewSplitScreenButton.hit()
         let viewInlineButton = NewDiscussion.viewInlineButton.waitUntil(.visible)

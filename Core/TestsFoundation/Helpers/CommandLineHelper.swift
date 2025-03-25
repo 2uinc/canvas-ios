@@ -16,6 +16,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
+import Foundation
+
 class CommandLine {
     enum ConnectionState: String {
         case on
@@ -28,7 +30,7 @@ class CommandLine {
     private static func networkServices() throws -> [String.SubSequence] {
         let rawResult = try exec("networksetup -listallnetworkservices")
         var result = rawResult.split(separator: "\n")
-        result.removeFirst()
+        result.removeFirst() // First line is this string: "An asterisk (*) denotes that a network service is disabled."
         var services: [String.SubSequence] = []
         for service in result {
             var s = service
@@ -77,11 +79,18 @@ class CommandLine {
 
         // Wait for the command to complete
         let semaphore = DispatchSemaphore(value: 0)
-        let task = URLSession.shared.dataTask(with: request) { data, _, error in
+        let task = URLSession.shared.dataTask(with: request) { data, urlResponse, error in
             defer { semaphore.signal() }
 
             if let error {
                 errorResult = error
+                return
+            }
+
+            if let urlResponse,
+               let httpResponse = urlResponse as? HTTPURLResponse,
+               httpResponse.statusCode != 200 {
+                errorResult = NSError.instructureError("Error while executing terminal service command: HTTP \(httpResponse.statusCode)")
                 return
             }
 

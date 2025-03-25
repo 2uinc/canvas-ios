@@ -58,6 +58,8 @@ struct SubmissionGrader: View {
     @State private var studentAnnotationViewModel: StudentAnnotationSubmissionViewerViewModel
     @State private var selectedIndex = 0
 
+    @AccessibilityFocusState private var focusedTab: GraderTab?
+
     private var selected: Submission { attempts.first { attempt == $0.attempt } ?? submission }
     private var file: File? {
         selected.attachments?.first { fileID == $0.id } ??
@@ -65,6 +67,7 @@ struct SubmissionGrader: View {
     }
 
     init(
+        env: AppEnvironment,
         index: Int,
         assignment: Assignment,
         submission: Submission,
@@ -73,7 +76,7 @@ struct SubmissionGrader: View {
         self.index = index
         self.assignment = assignment
         self.submission = submission
-        attempts = AppEnvironment.shared.subscribe(scope: Scope(
+        attempts = env.subscribe(scope: Scope(
             predicate: NSCompoundPredicate(andPredicateWithSubpredicates: [
                 NSPredicate(key: #keyPath(Submission.assignmentID), equals: assignment.id),
                 NSPredicate(key: #keyPath(Submission.userID), equals: submission.userID),
@@ -265,10 +268,14 @@ struct SubmissionGrader: View {
                     if drawerState == .min {
                         snapDrawerTo(.mid)
                     }
+                    let newTab = SubmissionGrader.GraderTab(rawValue: newValue ?? 0)!
                     withAnimation(.default) {
-                        tab = SubmissionGrader.GraderTab(rawValue: newValue ?? 0)!
+                        tab = newTab
                     }
                     controller.view.endEditing(true)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        focusedTab = tab
+                    }
                 }
             ),
             selectionAlignment: .bottom,
@@ -298,6 +305,7 @@ struct SubmissionGrader: View {
                     fileID = $0
                     snapDrawerTo(.min)
                 })
+
                 let isGradesOnScreen = isGraderTabOnScreen(.grades, isDrawer: isDrawer)
                 VStack(spacing: 0) {
                     SubmissionGrades(assignment: assignment, containerHeight: geometry.size.height, submission: submission)
@@ -307,6 +315,8 @@ struct SubmissionGrader: View {
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .accessibilityElement(children: isGradesOnScreen ? .contain : .ignore)
                 .accessibility(hidden: !isGradesOnScreen)
+                .accessibilityFocused($focusedTab, equals: .grades)
+
                 let isCommentsOnScreen = isGraderTabOnScreen(.comments, isDrawer: isDrawer)
                 VStack(spacing: 0) {
                     SubmissionCommentList(
@@ -317,7 +327,8 @@ struct SubmissionGrader: View {
                         fileID: drawerFileID,
                         showRecorder: $showRecorder,
                         enteredComment: $enteredComment,
-                        commentLibrary: commentLibrary
+                        commentLibrary: commentLibrary,
+                        focusedTab: _focusedTab
                     )
                     .clipped()
                     if showRecorder != .video || drawerState == .min {
@@ -328,6 +339,7 @@ struct SubmissionGrader: View {
                 .background(Color.backgroundLight)
                 .accessibilityElement(children: isCommentsOnScreen ? .contain : .ignore)
                 .accessibility(hidden: !isCommentsOnScreen)
+
                 let isFilesOnScreen = isGraderTabOnScreen(.files, isDrawer: isDrawer)
                 VStack(spacing: 0) {
                     SubmissionFileList(submission: selected, fileID: drawerFileID)
@@ -337,6 +349,7 @@ struct SubmissionGrader: View {
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .accessibilityElement(children: isFilesOnScreen ? .contain : .ignore)
                 .accessibility(hidden: !isFilesOnScreen)
+                .accessibilityFocused($focusedTab, equals: .files)
             }
             .frame(width: geometry.size.width, alignment: .leading)
             .background(Color.backgroundLightest)

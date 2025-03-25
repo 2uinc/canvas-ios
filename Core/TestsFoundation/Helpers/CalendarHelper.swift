@@ -16,6 +16,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
+import Foundation
+import XCTest
+
 public class CalendarHelper: BaseHelper {
     public struct SampleEvents {
         public var yesterdays: DSCalendarEvent?
@@ -40,6 +43,8 @@ public class CalendarHelper: BaseHelper {
     public static var navBar: XCUIElement { app.find(id: "Core.PlannerView") }
     public static var todayButton: XCUIElement { app.find(id: "PlannerCalendar.todayButton") }
     public static var addButton: XCUIElement { app.find(id: "PlannerCalendar.addButton") }
+    public static var addToDo: XCUIElement { app.find(id: "noteLine", type: .image) }
+    public static var addEvent: XCUIElement { app.find(id: "calendarMonthLine", type: .image) }
     public static var yearLabel: XCUIElement { app.find(id: "PlannerCalendar.yearLabel") }
     public static var monthButton: XCUIElement { app.find(id: "PlannerCalendar.monthButton") }
     public static var monthLabel: XCUIElement { app.find(id: "PlannerCalendar.monthButton").find(type: .staticText) }
@@ -69,6 +74,9 @@ public class CalendarHelper: BaseHelper {
     }
 
     public static func eventCellByIndex(index: Int) -> XCUIElement {
+        waitUntil {
+            app.findAll(idStartingWith: "PlannerList.event.").count < index + 1
+        }
         return app.findAll(idStartingWith: "PlannerList.event.")[index]
     }
 
@@ -120,7 +128,7 @@ public class CalendarHelper: BaseHelper {
         var monthLabelText = monthLabelElement.label
 
         if monthOfEvent != monthLabelText {
-            for _ in 1...12 {
+            for _ in 1...24 {
                 let buttonToSwipe = firstDayButtonOfView.waitUntil(.visible)
                 if monthSwipeDirection == "right" { buttonToSwipe.swipeRight() } else { buttonToSwipe.swipeLeft() }
                 monthLabelElement = monthLabel.waitUntil(.visible)
@@ -184,7 +192,7 @@ public class CalendarHelper: BaseHelper {
     }
 
     public struct Filter {
-        public static var navBar: XCUIElement { app.find(id: "Calendars") }
+        public static var navBar: XCUIElement { app.find(type: .navigationBar).find(label: "Calendars") }
         public static var doneButton: XCUIElement { app.find(label: "Done", type: .button) }
         public static var calendarsLabel: XCUIElement { app.find(label: "Calendars", type: .staticText) }
         public static var deselectAllButton: XCUIElement { app.find(labelContaining: "Deselect", type: .button) }
@@ -198,15 +206,22 @@ public class CalendarHelper: BaseHelper {
         public static var cancelButton: XCUIElement { app.find(label: "Cancel", type: .button) }
         public static var addButton: XCUIElement { app.find(label: "Add", type: .button) }
         public static var saveButton: XCUIElement { app.find(label: "Save", type: .button) }
-        public static var titleInput: XCUIElement { app.find(label: "Title", type: .textView) }
-        public static var calendarSelector: XCUIElement { app.find(labelContaining: "Calendar,", type: .button) }
-        public static var dateButton: XCUIElement { app.find(label: "Date and Time Picker") }
-        public static var datePicker: XCUIElement { dateButton.findAll(type: .button)[0] }
-        public static var timePicker: XCUIElement { dateButton.findAll(type: .button)[1] }
-        public static var detailsInput: XCUIElement { app.find(label: "Details", type: .textView) }
+        public static var titleInput: XCUIElement { app.find(id: "Calendar.Todo.title") }
+        public static var calendarSelector: XCUIElement { app.find(id: "Calendar.Todo.calendar") }
+        public static var datePickerContainer: XCUIElement { app.find(id: "Calendar.Todo.datePicker") }
+
+        public static var datePicker: XCUIElement {
+            datePickerContainer.find(type: .button).findAll(type: .button, minimumCount: 2)[0]
+        }
+
+        public static var timePicker: XCUIElement {
+            datePickerContainer.find(type: .button).findAll(type: .button, minimumCount: 2)[1]
+        }
+
+        public static var detailsInput: XCUIElement { app.find(id: "Calendar.Todo.details") }
 
         public struct CalendarSelector {
-            public static var newToDoButton: XCUIElement { app.find(label: "New To Do", type: .button) }
+            public static var backButton: XCUIElement { app.find(label: "Back", type: .button) }
 
             public static func userItem(user: DSUser) -> XCUIElement {
                 return app.find(label: user.name, type: .switch)

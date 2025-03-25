@@ -27,15 +27,8 @@ class TeacherTabBarController: UITabBarController, SnackBarProvider {
         super.viewDidLoad()
 
         delegate = self
-        let paths: [String]
-
-        if ExperimentalFeature.teacherCalendar.isEnabled {
-            viewControllers = [coursesTab(), calendarTab(), toDoTab(), inboxTab()]
-            paths = [ "/", "/calendar", "/to-do", "/conversations" ]
-        } else {
-            viewControllers = [coursesTab(), toDoTab(), inboxTab()]
-            paths = [ "/", "/to-do", "/conversations" ]
-        }
+        viewControllers = [coursesTab(), calendarTab(), toDoTab(), inboxTab()]
+        let paths = [ "/", "/calendar", "/to-do", "/conversations" ]
         selectedIndex = AppEnvironment.shared.userDefaults?.landingPath.flatMap {
             paths.firstIndex(of: $0)
         } ?? 0
@@ -53,6 +46,15 @@ class TeacherTabBarController: UITabBarController, SnackBarProvider {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
+    }
+
+    /// When the app was started in light mode and turned to dark the selected color was not updated so we do a force refresh.
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        tabBar.useGlobalNavStyle()
+
+        // This changes the elevated tab bar's text color (but for some reason only in light mode)
+        view.tintColor = Brand.shared.tabBarHighlightColor
     }
 
     func coursesTab() -> UIViewController {
@@ -113,16 +115,9 @@ class TeacherTabBarController: UITabBarController, SnackBarProvider {
     }
 
     private func reportScreenView(for tabIndex: Int, viewController: UIViewController) {
-        let map: [String]
-
-        if ExperimentalFeature.teacherCalendar.isEnabled {
-            map = ["dashboard", "calendar", "todo", "conversations"]
-        } else {
-            map = ["dashboard", "todo", "conversations"]
-        }
-
+        let map = ["dashboard", "calendar", "todo", "conversations"]
         let event = map[tabIndex]
-        Analytics.shared.logScreenView(route: "/tabs/" + event, viewController: viewController)
+        RemoteLogger.shared.logBreadcrumb(route: "/tabs/" + event, viewController: viewController)
     }
 
     @objc private func checkForPolicyChanges() {
@@ -140,5 +135,13 @@ extension TeacherTabBarController: UITabBarControllerDelegate {
         }
 
         return true
+    }
+
+    func tabBarController(
+        _ tabBarController: UITabBarController,
+        animationControllerForTransitionFrom fromVC: UIViewController,
+        to toVC: UIViewController
+    ) -> (any UIViewControllerAnimatedTransitioning)? {
+        InstUI.TabChangeTransition()
     }
 }

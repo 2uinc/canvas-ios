@@ -49,12 +49,19 @@
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>localhost</key>
+			<key>canvas-web.inseng.test</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
 			</dict>
-			<key>canvas.docker</key>
+			<key>docker</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>localhost</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
@@ -76,7 +83,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Frameworks/Core.framework/lato_semibold.ttf</string>
-		<string>Frameworks/Core.framework/lato-semibolditalic.ttf</string>
+		<string>Frameworks/Core.framework/lato_semibolditalic.ttf</string>
 		<string>Frameworks/Core.framework/lato_bolditalic.ttf</string>
 		<string>Frameworks/Core.framework/lato_italic.ttf</string>
 		<string>Frameworks/Core.framework/lato_black.ttf</string>

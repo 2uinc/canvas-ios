@@ -44,10 +44,20 @@ struct SubmissionCommentListCell: View {
                             self.attempt = attempt
                             self.fileID = file.id
                         }
+                        .accessibilityLabel(
+                            Text(comment.accessibilityLabelForAttemptAttachment(file, submission: submission))
+                        )
+                        .accessibilityHint(Text("Double tap to view file", bundle: .core))
                     }
                 } else {
                     Spacer().frame(height: 12)
-                    SubmissionAttempt(submission: submission) { self.attempt = attempt }
+                    SubmissionAttempt(submission: submission) {
+                        self.attempt = attempt
+                    }
+                    .accessibilityLabel(
+                        Text(comment.accessibilityLabelForAttempt(submission: submission))
+                    )
+                    .accessibilityHint(Text("Double tap to view attempt", bundle: .core))
                 }
             } else if comment.mediaType == .some(.audio), let url = comment.mediaLocalOrRemoteURL {
                 Spacer().frame(height: 12)
@@ -62,12 +72,13 @@ struct SubmissionCommentListCell: View {
             } else {
                 Spacer().frame(height: 4)
                 Text(comment.comment)
-                    .font(.regular14).foregroundColor(isAuthor ? .white : .textDarkest)
+                    .font(.regular14).foregroundColor(isAuthor ? .textLightest.variantForLightMode : .textDarkest)
                     .padding(.horizontal, 12).padding(.vertical, 8)
                     .background(CommentBackground()
                         .fill(isAuthor ? Color.backgroundInfo : Color.backgroundLight)
                         .scaleEffect(x: isAuthor ? -1: 1)
                     )
+                    .accessibilityHidden(true) // already included in header
                     .identifier("SubmissionComments.textCell.\(comment.id)")
                 ForEach(comment.attachments?.sorted(by: File.idCompare) ?? [], id: \.id) { file in
                     Spacer().frame(height: 4)
@@ -79,6 +90,10 @@ struct SubmissionCommentListCell: View {
                             options: .modal(embedInNav: true, addDoneButton: true)
                         )
                     }
+                    .accessibilityLabel(
+                        Text(comment.accessibilityLabelForCommentAttachment(file))
+                    )
+                    .accessibilityHint(Text("Double tap to view file", bundle: .core))
                 }
             }
         }
@@ -99,6 +114,20 @@ struct SubmissionCommentListCell: View {
                 Spacer()
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityRepresentation {
+            if assignment.anonymizeStudents && comment.authorID != currentUserID {
+                Text(comment.accessibilityLabelForHeader)
+            } else if let id = comment.authorID {
+                Button(
+                    action: { avatarButtonAction(authorId: id) },
+                    label: { Text(comment.accessibilityLabelForHeader) }
+                )
+                .accessibilityHint(Text("Double tap to view profile", bundle: .core))
+            } else {
+                Text(comment.accessibilityLabelForHeader)
+            }
+        }
     }
 
     @ViewBuilder var avatar: some View {
@@ -111,20 +140,22 @@ struct SubmissionCommentListCell: View {
                     .stroke(Color.borderMedium, lineWidth: 1)
                 )
         } else if let id = comment.authorID {
-            Button(action: {
-                env.router.route(
-                    to: "/courses/\(assignment.courseID)/users/\(id)",
-                    userInfo: ["navigatorOptions": ["modal": true]], // fix nav style
-                    from: controller,
-                    options: .modal(embedInNav: true, addDoneButton: true)
-                )
-            }, label: {
-                Avatar(name: comment.authorName, url: comment.authorAvatarURL)
-            })
-                .accessibility(label: Text(comment.authorName))
+            Button(
+                action: { avatarButtonAction(authorId: id) },
+                label: { Avatar(name: comment.authorName, url: comment.authorAvatarURL) }
+            )
         } else {
             Avatar(name: comment.authorName, url: comment.authorAvatarURL)
         }
+    }
+
+    private func avatarButtonAction(authorId: String) {
+        env.router.route(
+            to: "/courses/\(assignment.courseID)/users/\(authorId)",
+            userInfo: ["navigatorOptions": ["modal": true]], // fix nav style
+            from: controller,
+            options: .modal(embedInNav: true, addDoneButton: true)
+        )
     }
 
     @ViewBuilder func headerText() -> some View {
@@ -156,7 +187,6 @@ struct SubmissionCommentFile: View {
                 .frame(width: 300)
                 .background(RoundedRectangle(cornerRadius: 4).stroke(Color.borderMedium))
         })
-            .accessibility(label: Text("View file \(file.displayName ?? file.filename) \(file.size.humanReadableFileSize)", bundle: .teacher))
             .identifier("SubmissionComments.fileView.\(file.id ?? "")")
     }
 }
@@ -166,26 +196,7 @@ struct SubmissionAttempt: View {
     let action: () -> Void
 
     var icon: Image? {
-        switch submission.type {
-        case .basic_lti_launch, .external_tool:
-            return .ltiLine
-        case .discussion_topic:
-            return .discussionLine
-        case .media_recording:
-            return submission.mediaComment?.mediaType == .audio ? .audioLine : .videoLine
-        case .online_quiz:
-            return .quizLine
-        case .online_text_entry:
-            return .textLine
-        case .online_url:
-            return .linkLine
-        case .student_annotation:
-            return .annotateLine
-        case .wiki_page:
-            return .documentLine
-        case .none?, .not_graded, .on_paper, .online_upload, nil:
-            return nil
-        }
+        submission.attemptIcon.map { Image(uiImage: $0) }
     }
 
     var body: some View {
@@ -193,9 +204,9 @@ struct SubmissionAttempt: View {
             HStack(alignment: .top, spacing: 6) {
                 icon?.size(18).foregroundColor(.accentColor)
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(submission.type?.localizedString ?? "")
+                    Text(submission.attemptTitle ?? "")
                         .font(.semibold14).foregroundColor(.textDarkest)
-                    Text(submission.subtitle ?? "")
+                    Text(submission.attemptSubtitle ?? "")
                         .font(.medium12).foregroundColor(.textDark)
                         .lineLimit(1)
                 }
@@ -205,7 +216,6 @@ struct SubmissionAttempt: View {
                 .frame(width: 300)
                 .background(RoundedRectangle(cornerRadius: 4).stroke(Color.borderMedium))
         })
-            .accessibility(label: Text("View submission attempt \(submission.attempt). \(submission.type?.localizedString ?? "")", bundle: .teacher))
     }
 }
 

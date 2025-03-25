@@ -59,6 +59,15 @@ class StudentTabBarController: UITabBarController, SnackBarProvider {
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
+    /// When the app was started in light mode and turned to dark the selected color was not updated so we do a force refresh.
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        tabBar.useGlobalNavStyle()
+
+        // This changes the elevated tab bar's text color (but for some reason only in light mode)
+        view.tintColor = Brand.shared.tabBarHighlightColor
+    }
+
     func dashboardTab() -> UIViewController {
         let result: UIViewController
         let tabBarTitle: String
@@ -76,7 +85,7 @@ class StudentTabBarController: UITabBarController, SnackBarProvider {
             tabBarImageSelected = .homeroomTabActive
         } else {
             let dashboard = CoreHostingController(DashboardContainerView(shouldShowGroupList: true,
-                                                                    showOnlyTeacherEnrollment: false))
+                                                                         showOnlyTeacherEnrollment: false))
             result = DashboardContainerViewController(rootViewController: dashboard) { CoreSplitViewController() }
 
             tabBarTitle = String(localized: "Dashboard", bundle: .student, comment: "dashboard page title")
@@ -94,8 +103,16 @@ class StudentTabBarController: UITabBarController, SnackBarProvider {
 
     func calendarTab() -> UIViewController {
         let split = CoreSplitViewController()
+
+        let planner: UIViewController
+        if ExperimentalFeature.rebuiltCalendar.isEnabled {
+            planner = PlannerAssembly.makeNewPlannerViewController()
+        } else {
+            planner = CoreNavigationController(rootViewController: PlannerViewController.create())
+        }
+
         split.viewControllers = [
-            CoreNavigationController(rootViewController: PlannerViewController.create()),
+            planner,
             CoreNavigationController(rootViewController: EmptyViewController())
         ]
         split.view.tintColor = Brand.shared.primary
@@ -165,7 +182,7 @@ class StudentTabBarController: UITabBarController, SnackBarProvider {
     private func reportScreenView(for tabIndex: Int, viewController: UIViewController) {
         let map = [AppEnvironment.shared.k5.isK5Enabled ? "homeroom": "dashboard", "calendar", "todo", "notifications", "conversations"]
         let event = map[tabIndex]
-        Analytics.shared.logScreenView(route: "/tabs/" + event, viewController: viewController)
+        RemoteLogger.shared.logBreadcrumb(route: "/tabs/" + event, viewController: viewController)
     }
 
     @objc private func checkForPolicyChanges() {
@@ -176,6 +193,7 @@ class StudentTabBarController: UITabBarController, SnackBarProvider {
 }
 
 extension StudentTabBarController: UITabBarControllerDelegate {
+
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         tabBarController.resetViewControllerIfSelected(viewController)
 
@@ -184,5 +202,13 @@ extension StudentTabBarController: UITabBarControllerDelegate {
         }
 
         return true
+    }
+
+    func tabBarController(
+        _ tabBarController: UITabBarController,
+        animationControllerForTransitionFrom fromVC: UIViewController,
+        to toVC: UIViewController
+    ) -> (any UIViewControllerAnimatedTransitioning)? {
+        InstUI.TabChangeTransition()
     }
 }

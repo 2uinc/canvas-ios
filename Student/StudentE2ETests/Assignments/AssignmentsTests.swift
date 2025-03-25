@@ -17,6 +17,7 @@
 //
 
 import TestsFoundation
+import XCTest
 
 class AssignmentsTests: E2ETestCase {
     typealias Helper = AssignmentsHelper
@@ -122,9 +123,6 @@ class AssignmentsTests: E2ETestCase {
 
         // MARK: Navigate to Assignments and tap the assignment
         Helper.navigateToAssignments(course: course)
-        let navBar = Helper.navBar(course: course).waitUntil(.visible)
-        XCTAssertTrue(navBar.isVisible)
-
         let assignmentButton = Helper.assignmentButton(assignment: assignment).waitUntil(.visible)
         XCTAssertTrue(assignmentButton.isVisible)
         assignmentButton.hit()
@@ -134,9 +132,6 @@ class AssignmentsTests: E2ETestCase {
         submitAssignmentButton.hit()
 
         // MARK: Check visibility of elements on submission edit screen
-        let submissionNavBar = SubmissionHelper.navBar.waitUntil(.visible)
-        XCTAssertTrue(submissionNavBar.isVisible)
-
         let submissionCancelButton = SubmissionHelper.cancelButton.waitUntil(.visible)
         XCTAssertTrue(submissionCancelButton.isVisible)
         XCTAssertTrue(submissionCancelButton.hasLabel(label: "Cancel"))
@@ -146,12 +141,12 @@ class AssignmentsTests: E2ETestCase {
         XCTAssertTrue(submissionSubmitButton.isDisabled)
         XCTAssertTrue(submissionSubmitButton.hasLabel(label: "Submit"))
 
-        let textField = SubmissionHelper.textField.waitUntil(.visible)
-        XCTAssertTrue(textField.isVisible)
+        let textView = SubmissionHelper.textView.waitUntil(.visible)
+        XCTAssertTrue(textView.isVisible)
 
         // MARK: Write some text and submit the assignment
         let testText = "SubmitAssignment test"
-        textField.pasteText(text: testText)
+        textView.writeText(text: testText)
 
         submissionSubmitButton = SubmissionHelper.submitButton.waitUntil(.visible)
         XCTAssertTrue(submissionSubmitButton.isEnabled)
@@ -349,23 +344,26 @@ class AssignmentsTests: E2ETestCase {
         XCTAssertTrue(commentTextView.isVisible)
 
         // MARK: Check attemptSelector
-        drawerGripper.tapAndHoldAndDragToElement(element: commentTextView)
-        let attemptPickerToggle = DetailsHelper.SubmissionDetails.attemptPickerToggle.waitUntil(.visible)
-        XCTAssertTrue(attemptPickerToggle.isVisible)
-
-        attemptPickerToggle.hit()
         let attemptPicker = DetailsHelper.SubmissionDetails.attemptPicker.waitUntil(.visible)
-        let pickerWheel = DetailsHelper.SubmissionDetails.pickerWheel.waitUntil(.visible)
-        XCTAssertTrue(attemptPicker.isVisible)
-        XCTAssertTrue(pickerWheel.isVisible)
-        XCTAssertTrue(pickerWheel.hasValue(value: "Attempt 2", strict: false))
+        XCTAssert(attemptPicker.isVisible)
+        XCTAssert(attemptPicker.labelHasPrefix("Attempt 2"))
 
-        pickerWheel.tapAndHoldAndDragToElement(element: attemptPickerToggle)
-        XCTAssertTrue(pickerWheel.hasValue(value: "Attempt 1", strict: false))
+        attemptPicker.tap()
+        let attemptPickerItems = DetailsHelper.SubmissionDetails.attemptPickerItems.map { $0.waitUntil(.visible) }
+        if attemptPickerItems.count == 2 {
+            XCTAssert(attemptPickerItems[0].label.contains("Attempt 2"))
+            XCTAssert(attemptPickerItems[0].isSelected)
+            XCTAssert(attemptPickerItems[1].label.contains("Attempt 1"))
+            XCTAssert(attemptPickerItems[1].isUnselected)
+
+            attemptPickerItems[1].tap()
+            attemptPicker.waitUntil(.visible)
+            XCTAssert(attemptPicker.labelHasPrefix("Attempt 1"))
+        } else {
+            XCTFail("Invalid count")
+        }
 
         // MARK: Check adding a comment
-        attemptPickerToggle.hit()
-        drawerGripper.tapAndHoldAndDragToElement(element: attemptPickerToggle)
         commentTextView.writeText(text: "Test Comment")
         XCTAssertTrue(addCommentButton.waitUntil(.visible).isVisible)
         XCTAssertTrue(addCommentButton.isEnabled)

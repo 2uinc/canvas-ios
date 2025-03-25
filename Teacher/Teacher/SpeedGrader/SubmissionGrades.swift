@@ -75,6 +75,7 @@ struct SubmissionGrades: View {
                 VStack(spacing: 0) {
                     HStack(spacing: 0) {
                         Text("Grade", bundle: .teacher)
+                            .accessibilityAddTraits(.isHeader)
                         Spacer()
                         if isSaving {
                             ProgressView()
@@ -148,7 +149,10 @@ struct SubmissionGrades: View {
     }
 
     private func commentEditor(id: String) -> some View {
-        CommentEditor(text: $rubricComment, action: {
+        CommentEditor(text: $rubricComment,
+                      shouldShowCommentLibrary: false,
+                      showCommentLibrary: .constant(false),
+                      action: {
             var points: Double?
             var ratingID = ""
             if let assessment = rubricAssessments[id] {
@@ -351,7 +355,8 @@ struct SubmissionGrades: View {
     }
 }
 
-extension UIAlertController: UITextFieldDelegate {
+extension UIAlertController {
+
     @objc public func performOKAlertAction() {
         if let ok = actions.first(where: { $0.title == String(localized: "OK", bundle: .teacher) }) as? AlertAction {
             ok.handler?(ok)

@@ -16,6 +16,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 
+import XCTest
+
 public class PagesHelper: BaseHelper {
     public static var frontPage: XCUIElement { app.find(id: "PageList.frontPage") }
     public static var frontPageHeading: XCUIElement { app.find(id: "PageList.frontPageHeading") }
@@ -33,7 +35,7 @@ public class PagesHelper: BaseHelper {
         public static var published: XCUIElement { app.find(id: "PageEditor.publishedToggle") }
         public static var frontPage: XCUIElement { app.find(id: "PageEditor.frontPageToggle") }
         public static var editors: XCUIElement { app.find(id: "PageEditor.editorsButton") }
-        public static var content: XCUIElement { app.find(label: "Page content", type: .textField) }
+        public static var content: XCUIElement { app.find(label: "Page content", type: .textView) }
     }
 
     public struct Details {

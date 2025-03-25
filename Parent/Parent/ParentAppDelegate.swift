@@ -54,14 +54,14 @@ class ParentAppDelegate: UIResponder, UIApplicationDelegate {
         PushNotificationsInteractor.shared.notificationCenter.delegate = self
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
         UITableView.setupDefaultSectionHeaderTopPadding()
-        FontAppearance.update()
+        Appearance.update()
 
         if let session = LoginSession.mostRecent {
             window?.rootViewController = LoadingViewController.create()
             userDidLogin(session: session)
         } else {
             window?.rootViewController = LoginNavigationController.create(loginDelegate: self, fromLaunch: true, app: .parent)
-            Analytics.shared.logScreenView(route: "/login", viewController: window?.rootViewController)
+            RemoteLogger.shared.logBreadcrumb(route: "/login", viewController: window?.rootViewController)
         }
         window?.makeKeyAndVisible()
         return true
@@ -111,7 +111,8 @@ class ParentAppDelegate: UIResponder, UIApplicationDelegate {
                 ReactiveStore(useCase: GetBrandVariables())
                     .getEntities()
                     .receive(on: RunLoop.main)
-                    .sink(receiveCompletion: { _ in }) { [weak self] brandVars in
+                    .replaceError(with: [])
+                    .sink { [weak self] brandVars in
                         brandVars.first?.applyBrandTheme()
                         self?.showRootView()
                     }
@@ -122,7 +123,7 @@ class ParentAppDelegate: UIResponder, UIApplicationDelegate {
 
     func showRootView() {
         guard let window = self.window else { return }
-        let controller = CoreNavigationController(rootViewController: DashboardViewController.create())
+        let controller = ParentContainerNavigationController(rootViewController: DashboardViewController.create())
         controller.view.layoutIfNeeded()
         UIView.transition(with: window, duration: 0.5, options: .transitionFlipFromRight, animations: {
             window.rootViewController = controller
@@ -166,11 +167,11 @@ extension ParentAppDelegate: LoginDelegate {
     var findSchoolButtonTitle: String { String(localized: "Find School", bundle: .parent) }
 
     func changeUser() {
-        guard let window = window, !(window.rootViewController is LoginNavigationController) else { return }
+        guard let window = window, window.isShowingLoginStartViewController == false else { return }
         disableTracking()
         UIView.transition(with: window, duration: 0.5, options: .transitionFlipFromLeft, animations: {
             window.rootViewController = LoginNavigationController.create(loginDelegate: self, app: .parent)
-            Analytics.shared.logScreenView(route: "/login", viewController: window.rootViewController)
+            RemoteLogger.shared.logBreadcrumb(route: "/login", viewController: window.rootViewController)
         }, completion: nil)
     }
 
@@ -182,7 +183,7 @@ extension ParentAppDelegate: LoginDelegate {
                 let safari = SFSafariViewController(url: url)
                 safari.modalPresentationStyle = .fullScreen
                 topVC.present(safari, animated: true, completion: nil)
-                Analytics.shared.logScreenView(route: "/external_url")
+                RemoteLogger.shared.logBreadcrumb(route: "/external_url")
             }
         } else {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
@@ -255,6 +256,7 @@ extension ParentAppDelegate {
 }
 
 // MARK: Error Handling
+
 extension ParentAppDelegate {
     func setupDefaultErrorHandling() {
         environment.errorHandler = { error, controller in performUIUpdate {
@@ -268,27 +270,33 @@ extension ParentAppDelegate {
 }
 
 // MARK: Crashlytics
+
 extension ParentAppDelegate {
+
     @objc func setupFirebase() {
         guard !testing else { return }
         if FirebaseOptions.defaultOptions()?.apiKey != nil {
             FirebaseApp.configure()
             configureRemoteConfig()
             Analytics.shared.handler = self
+            RemoteLogger.shared.handler = self
         }
     }
 }
 
-extension ParentAppDelegate: AnalyticsHandler {
+extension ParentAppDelegate: RemoteLogHandler {
 
-    func handleScreenView(screenName: String, screenClass: String, application: String) {
-        Firebase.Crashlytics.crashlytics().log("\(screenName) (\(screenClass))")
+    func handleBreadcrumb(_ name: String) {
+        Firebase.Crashlytics.crashlytics().log(name)
     }
 
     func handleError(_ name: String, reason: String) {
         let model = ExceptionModel(name: name, reason: reason)
         Firebase.Crashlytics.crashlytics().record(exceptionModel: model)
     }
+}
+
+extension ParentAppDelegate: AnalyticsHandler {
 
     func handleEvent(_ name: String, parameters: [String: Any]?) {
     }

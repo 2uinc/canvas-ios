@@ -21,9 +21,16 @@ import Combine
 @testable import Core
 @testable import Teacher
 import TestsFoundation
+import XCTest
 
 class SpeedGraderViewControllerTests: TeacherTestCase {
-    lazy var controller = SpeedGraderViewController(context: .course("1"), assignmentID: "1", userID: "1", filter: [])
+    lazy var controller = SpeedGraderViewController(
+        env: environment,
+        context: .course("1"),
+        assignmentID: "1",
+        userID: "1",
+        filter: []
+    )
 
     override func setUp() {
         super.setUp()
@@ -40,7 +47,13 @@ class SpeedGraderViewControllerTests: TeacherTestCase {
     }
 
     func testEmpty() throws {
-        controller = SpeedGraderViewController(context: .course("1"), assignmentID: "1", userID: "bogus", filter: [])
+        controller = SpeedGraderViewController(
+            env: environment,
+            context: .course("1"),
+            assignmentID: "1",
+            userID: "bogus",
+            filter: []
+        )
         controller.view.layoutIfNeeded()
         XCTAssertNil(controller.pages.parent)
         XCTAssertNotNil(controller.emptyView.parent)
@@ -57,12 +70,37 @@ class SpeedGraderViewControllerTests: TeacherTestCase {
             .make(id: "1", course_id: "1", enrollment_state: .active, user_id: "1"),
             .make(id: "2", course_id: "1", enrollment_state: .inactive, user_id: "2")
         ])
-        controller = SpeedGraderViewController(context: .course("1"), assignmentID: "1", userID: "1", filter: [.needsGrading])
+        controller = SpeedGraderViewController(
+            env: environment,
+            context: .course("1"),
+            assignmentID: "1",
+            userID: "1",
+            filter: [.needsGrading]
+        )
 
         // WHEN
         controller.view.layoutIfNeeded()
 
         // THEN
         XCTAssertEqual(controller.submissions.all.count, 1)
+    }
+
+    func test_normalizeUserID() {
+        XCTAssertEqual(
+            SpeedGraderViewController.normalizeUserID(nil),
+            SpeedGraderViewController.AllUsersUserID
+        )
+        XCTAssertEqual(
+            SpeedGraderViewController.normalizeUserID(":student"),
+            SpeedGraderViewController.AllUsersUserID
+        )
+        XCTAssertEqual(
+            SpeedGraderViewController.normalizeUserID("ABC"),
+            SpeedGraderViewController.AllUsersUserID
+        )
+        XCTAssertEqual(
+            SpeedGraderViewController.normalizeUserID("123"),
+            "123"
+        )
     }
 }

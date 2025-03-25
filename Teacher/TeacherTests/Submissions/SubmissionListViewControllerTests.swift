@@ -21,7 +21,13 @@ import XCTest
 @testable import Teacher
 
 class SubmissionListViewControllerTests: TeacherTestCase {
-    lazy var controller = SubmissionListViewController.create(context: .course("1"), assignmentID: "1", filter: [])
+    lazy var controller = SubmissionListViewController
+        .create(
+            env: environment,
+            context: .course("1"),
+            assignmentID: "1",
+            filter: []
+        )
 
     override func setUp() {
         super.setUp()
@@ -74,7 +80,7 @@ class SubmissionListViewControllerTests: TeacherTestCase {
         window.makeKeyAndVisible()
         XCTAssertEqual(controller.titleSubtitleView.title, "Submissions")
         XCTAssertEqual(controller.titleSubtitleView.subtitle, "some assignment")
-        XCTAssertEqual(nav.navigationBar.barTintColor!.hexString, UIColor(hexString: "#f00")!.ensureContrast(against: .backgroundLightest).hexString)
+        XCTAssertEqual(nav.navigationBar.barTintColor!.hexString, UIColor(hexString: "#f00")!.ensureContrast(against: .textLightest.variantForLightMode).hexString)
         XCTAssertEqual(controller.navigationItem.rightBarButtonItems?.count, 2)
 
         var cell = controller.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? SubmissionListCell

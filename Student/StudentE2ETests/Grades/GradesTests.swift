@@ -17,6 +17,7 @@
 //
 
 import TestsFoundation
+import XCTest
 
 class GradesTests: E2ETestCase {
     func testGrades() {
@@ -302,8 +303,27 @@ class GradesTests: E2ETestCase {
         XCTAssertTrue(totalGradeLabel.isVisible)
         XCTAssertTrue(totalGradeLabel.hasLabel(label: "Total grade is \(expectedTotalGrade)"))
 
-        let labelOfAG1 = GradesHelper.labelOfAG(assignmentGroup: testAG1).waitUntil(.visible)
-        let labelOfAG2 = GradesHelper.labelOfAG(assignmentGroup: testAG2).waitUntil(.visible)
+        let filterButton = GradesHelper.filterButton.waitUntil(.visible)
+        let upcomingAssignmentsLabel = GradesHelper.upcomingAssignmentsSectionTitle(numberOfItems: 2).waitUntil(.visible)
+        XCTAssertTrue(filterButton.isVisible)
+        XCTAssertTrue(upcomingAssignmentsLabel.isVisible)
+
+        filterButton.hit()
+        let sortByGroupSwitch = GradesHelper.Filter.sortByGroupSwitch.waitUntil(.visible)
+        let sortByDateSwitch = GradesHelper.Filter.sortByDateSwitch.waitUntil(.visible)
+        let saveButton = GradesHelper.Filter.saveButton.waitUntil(.visible)
+        XCTAssertTrue(sortByGroupSwitch.isVisible)
+        XCTAssertTrue(sortByDateSwitch.isVisible)
+        XCTAssertTrue(saveButton.isVisible)
+        XCTAssertTrue(saveButton.isDisabled)
+
+        sortByGroupSwitch.hit()
+        XCTAssertTrue(saveButton.waitUntil(.enabled).isEnabled)
+
+        saveButton.hit()
+
+        let labelOfAG1 = GradesHelper.labelOfAssignmentGroup(testAG1, numberOfItems: 1).waitUntil(.visible)
+        let labelOfAG2 = GradesHelper.labelOfAssignmentGroup(testAG2, numberOfItems: 1).waitUntil(.visible)
         XCTAssertTrue(labelOfAG1.isVisible)
         XCTAssertTrue(labelOfAG2.isVisible)
 
@@ -379,13 +399,13 @@ class GradesTests: E2ETestCase {
         let totalGrade = GradesHelper.totalGrade.waitUntil(.visible)
         totalGrade.waitUntil(.label(expected: basedOnGradedExpected))
         XCTAssertTrue(basedOnGradedSwitch.isVisible)
-        XCTAssertTrue(basedOnGradedSwitch.hasValue(value: "1"))
+        XCTAssertTrue(basedOnGradedSwitch.hasValue(value: "on"))
         XCTAssertTrue(totalGrade.isVisible)
         XCTAssertTrue(totalGrade.hasLabel(label: basedOnGradedExpected, strict: false))
 
         // MARK: Toggle switch, check Total Grade again
         basedOnGradedSwitch.hit()
-        XCTAssertTrue(basedOnGradedSwitch.waitUntil(.value(expected: "0")).hasValue(value: "0"))
+        XCTAssertTrue(basedOnGradedSwitch.waitUntil(.value(expected: "off")).hasValue(value: "off"))
         XCTAssertTrue(totalGrade.isVisible)
         XCTAssertTrue(totalGrade.hasLabel(label: notBasedOnGradedExpected, strict: false))
     }
