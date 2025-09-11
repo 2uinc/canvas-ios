@@ -1,0 +1,83 @@
+
+name: iOS CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - cicd
+
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    env:
+      IOS_PROVISION_PROFILE: ${{ secrets.DEGREES_PROVISION_PROFILE }}
+      IOS_CERTIFICATE: ${{ secrets.DEGREES_CERTIFICATE }}
+      IOS_CERTIFICATE_PASSWORD: ${{ secrets.DEGREES_P12_PASSWORD }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Show available Xcode versions
+      run: ls /Applications | grep Xcode
+
+    - name: Use default Xcode
+      run: |
+        echo "Using default Xcode path:"
+        xcode-select -p
+
+
+    # - name: Resolve SwiftPM dependencies
+    #   run: |
+    #     cd source
+    #     xcodebuild -resolvePackageDependencies
+
+    # - name: Create Authentication.swift file
+    #   env:
+    #     AUTHENTICATION_SECRET_FILE: ${{ secrets.AUTHENTICATION_SECRET_FILE }}
+    #   run: |
+    #     echo $AUTHENTICATION_SECRET_FILE | base64 -d > source/OnlineCampus/Main/Authentication.swift
+
+    # - name: Install provisioning profile
+    #   run: |
+    #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+    #     echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+    #   env:
+    #     IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
+
+    # - name: Install signing certificate
+    #   run: |
+    #     echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
+    #     security create-keychain -p "" build.keychain
+    #     security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+    #     security list-keychains -s build.keychain
+    #     security default-keychain -s build.keychain
+    #     security unlock-keychain -p "" build.keychain
+
+    # - name: Build and archive
+    #   run: |
+    #     mkdir ${{ github.workspace }}/build
+    #     cd source
+    #     xcodebuild archive \
+    #       -scheme GetSmarterStaging \
+    #       -configuration Debug \
+    #       -destination 'generic/platform=iOS' \
+    #       -archivePath ${{ github.workspace }}/build/GetSmarterStaging.xcarchive
+
+    # - name: Export IPA
+    #   run: |
+    #     xcodebuild -exportArchive \
+    #       -archivePath ${{ github.workspace }}/build/GetSmarterStaging.xcarchive \
+    #       -exportOptionsPlist ./ExportOptions.plist \
+    #       -exportPath ${{ github.workspace }}/build
+
+    # - name: Upload IPA artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: GetSmarterStaging
+    #     path: ${{ github.workspace }}/build
