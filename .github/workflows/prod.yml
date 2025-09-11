@@ -3,11 +3,7 @@ name: iOS CI/CD
 
 on:
   push:
-    branches:
-      - develop
-  pull_request:
-    branches:
-      - cicd
+    branches: ["develop" ,"features/cicd"]
 
 
 jobs:
