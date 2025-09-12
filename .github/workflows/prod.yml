@@ -53,12 +53,6 @@ jobs:
           yarn build-secrets "bugfenderKey=${{ secrets.BUGFENDER_KEY }}"
 
 
-      # - name: Resolve SwiftPM dependencies
-      #   run: |
-      #     cd source
-      #     xcodebuild -resolvePackageDependencies
-  
-      
       - name: Install provisioning profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
@@ -82,9 +76,17 @@ jobs:
   
       - name: Install signing certificate
         run: |
+          # Check if the keychain already exists, if not create it
+          if ! security list-keychains | grep -q "build.keychain"; then
+            security create-keychain -p "" build.keychain
+          fi
+      
+          # Import the certificate into the keychain
           echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
-          security create-keychain -p "" build.keychain
           security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+      
+          # Set build.keychain as the default keychain
           security list-keychains -s build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
+
