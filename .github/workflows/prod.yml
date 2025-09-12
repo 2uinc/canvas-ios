@@ -66,6 +66,10 @@ jobs:
         env:
           IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
 
+      - name: Log the decoded certificate
+        run: echo "$IOS_CERTIFICATE" | base64 --decode | hexdump -C
+
+
       - name: Install signing certificate
         run: |
           echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
