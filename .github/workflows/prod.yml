@@ -62,9 +62,9 @@ jobs:
       - name: Install provisioning profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          echo "$DEGREES_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
         env:
-          IOS_PROVISION_PROFILE: ${{ secrets.DEGREES_PROVISION_PROFILE }}
+          DEGREES_PROVISION_PROFILE: ${{ secrets.DEGREES_PROVISION_PROFILE }}
 
       - name: Install signing certificate
         run: |
