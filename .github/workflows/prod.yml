@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # ✅ Use only once
+        uses: actions/checkout@v4  
 
       - name: Show available Xcode versions
         run: ls /Applications | grep Xcode
@@ -53,10 +53,10 @@ jobs:
           yarn build-secrets "bugfenderKey=${{ secrets.BUGFENDER_KEY }}"
 
 
-      - name: Resolve SwiftPM dependencies
-        run: |
-          cd source
-          xcodebuild -resolvePackageDependencies
+      # - name: Resolve SwiftPM dependencies
+      #   run: |
+      #     cd source
+      #     xcodebuild -resolvePackageDependencies
   
       
       - name: Install provisioning profile
