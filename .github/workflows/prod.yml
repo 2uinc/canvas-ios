@@ -76,12 +76,16 @@ jobs:
   
       - name: Install signing certificate
         run: |
-          # Check if the keychain already exists, if not create it
-          if ! security list-keychains | grep -q "build.keychain"; then
-            security create-keychain -p "" build.keychain
+          # Check if the keychain exists and delete it if it does
+          if security list-keychains | grep -q "build.keychain"; then
+            echo "Keychain exists, deleting it..."
+            security delete-keychain build.keychain
           fi
       
-          # Import the certificate into the keychain
+          # Create a new keychain
+          security create-keychain -p "" build.keychain
+      
+          # Import the certificate into the new keychain
           echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
           security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
       
@@ -89,4 +93,10 @@ jobs:
           security list-keychains -s build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
+        shell: /bin/bash -e {0}
+        env:
+          IOS_PROVISION_PROFILE: ***
+          IOS_CERTIFICATE: ***
+          IOS_CERTIFICATE_PASSWORD: ***
+
 
