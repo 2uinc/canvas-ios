@@ -65,6 +65,16 @@ jobs:
           echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
         env:
           IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
+      - name: Debug certificate import
+        run: |
+          echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
+          ls -l certificate.p12
+          file certificate.p12
+          # Try importing with openssl
+          openssl pkcs12 -in certificate.p12 -out certificate.pem -nodes || echo "OpenSSL failed"
+          # Import using security tool (as fallback)
+          security create-keychain -p "" build.keychain
+          security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign || echo "Security import failed"
 
 
       - name: Install signing certificate
