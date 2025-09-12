@@ -70,5 +70,25 @@ jobs:
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
 
+      - name: Verify code signing identities
+        run: |
+          echo "Listing available code signing identities..."
+          security find-identity -v -p codesigning
+          
+      - name: List certificates in keychain
+        run: security list-keychains && security show-keychain-info build.keychain
+  
+      - name: Check provisioning profile
+        run: ls ~/Library/MobileDevice/Provisioning\ Profiles
+      
+      - name: Build and archive
+        run: |
+          mkdir ${{ github.workspace }}/build
+          cd source
+          xcodebuild archive \
+            -scheme Student \
+            -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            -archivePath ${{ github.workspace }}/build/DegreesStudent.xcarchive
 
 
