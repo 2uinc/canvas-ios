@@ -61,38 +61,15 @@ jobs:
           IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
 
           
-      - name: Debug certificate import
-        run: |
-          echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
-          ls -l certificate.p12
-          file certificate.p12
-          # Try importing with openssl
-          openssl pkcs12 -in certificate.p12 -out certificate.pem -nodes || echo "OpenSSL failed"
-          # Import using security tool (as fallback)
-          security create-keychain -p "" build.keychain
-          security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign || echo "Security import failed"
-
       - name: Install signing certificate
         run: |
-          # Check if the keychain exists and delete it if it does
-          if security list-keychains | grep -q "build.keychain"; then
-            echo "Keychain exists, deleting it..."
-            security delete-keychain build.keychain
-          fi
-      
-          # Create a new keychain
-          security create-keychain -p "" build.keychain
-      
-          # Import the certificate into the new keychain
           echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
+          security create-keychain -p "" build.keychain
           security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-      
-          # Set build.keychain as the default keychain
           security list-keychains -s build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
-        shell: /bin/bash -e {0}
-   
+       
 
 
 
