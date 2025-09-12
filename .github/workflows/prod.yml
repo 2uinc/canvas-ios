@@ -79,13 +79,6 @@ jobs:
           security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign || echo "Security import failed"
 
 
-            
-      - name: Install provisioning profile
-        run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-        env:
-          IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
   
       - name: Install signing certificate
         run: |
