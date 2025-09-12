@@ -81,14 +81,23 @@ jobs:
       - name: Check provisioning profile
         run: ls ~/Library/MobileDevice/Provisioning\ Profiles
       
-      - name: Build and archive
+      - name: Build and Archive
         run: |
-          mkdir ${{ github.workspace }}/build
-          cd source
-          xcodebuild archive \
-            -scheme Student \
-            -configuration Debug \
-            -destination 'generic/platform=iOS' \
-            -archivePath ${{ github.workspace }}/build/DegreesStudent.xcarchive
+            xcodebuild \
+              -workspace Canvas.xcworkspace \
+              -scheme Student \
+              -sdk iphoneos \
+              -configuration Release \
+              -archivePath $PWD/build/Student.xcarchive \
+              clean archive
+        
+      - name: Export IPA
+        run: |
+          xcodebuild \
+            -exportArchive \
+            -archivePath $PWD/build/Student.xcarchive \
+            -exportPath $PWD/build/ipa \
+            -exportOptionsPlist ExportOptions.plist
+
 
 
