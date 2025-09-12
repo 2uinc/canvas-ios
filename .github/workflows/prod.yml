@@ -62,15 +62,15 @@ jobs:
       - name: Install provisioning profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$DEGREES_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
         env:
-          DEGREES_PROVISION_PROFILE: ${{ secrets.DEGREES_PROVISION_PROFILE }}
+          IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
 
       - name: Install signing certificate
         run: |
-          echo "$DEGREES_CERTIFICATE" | base64 --decode > certificate.p12
+          echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
           security create-keychain -p "" build.keychain
-          security import certificate.p12 -k build.keychain -P "$DEGREES_P12_PASSWORD" -T /usr/bin/codesign
+          security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
           security list-keychains -s build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
