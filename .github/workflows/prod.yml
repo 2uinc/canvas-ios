@@ -72,8 +72,6 @@ jobs:
           security create-keychain -p "" build.keychain
           security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign || echo "Security import failed"
 
-
-  
       - name: Install signing certificate
         run: |
           # Check if the keychain exists and delete it if it does
@@ -94,9 +92,7 @@ jobs:
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
         shell: /bin/bash -e {0}
-        env:
-          IOS_PROVISION_PROFILE: ***
-          IOS_CERTIFICATE: ***
-          IOS_CERTIFICATE_PASSWORD: ***
+   
+
 
 
