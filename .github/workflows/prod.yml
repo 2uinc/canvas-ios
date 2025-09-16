@@ -11,7 +11,7 @@ jobs:
     
     env:
       IOS_PROVISION_PROFILE: ${{ secrets.DEGREES_PROVISION_PROFILE }}
-      IOS_CERTIFICATE: ${{ secrets.DEGREES_CERTIFICATE }}
+      IOS_CERTIFICATE: ${{ secrets.DEGREES_CERTIFICATE_P12 }}
       IOS_CERTIFICATE_PASSWORD: ${{ secrets.DEGREES_P12_PASSWORD }}
 
     steps:
@@ -38,18 +38,11 @@ jobs:
       - name: Run sync script
         run: make sync
           
-      - name: Build secrets - AWS Keys
+      - name: Build secrets 
         run: |
           yarn build-secrets "awsAccessKey=${{ secrets.AWS_ACCESS_KEY }}" "awsSecretKey=${{ secrets.AWS_SECRET_KEY }}"
-
-      - name: Build secrets - Custom Push Domain
-        run: |
-          yarn build-secrets "customPushDomain=${{ secrets.CUSTOM_PUSH_DOMAIN }}"
-
-      - name: Build secrets - Bugfender Key
-        run: |
-          yarn build-secrets "bugfenderKey=${{ secrets.BUGFENDER_KEY }}"
-
+           yarn build-secrets "customPushDomain=${{ secrets.CUSTOM_PUSH_DOMAIN }}"
+           yarn build-secrets "bugfenderKey=${{ secrets.BUGFENDER_KEY }}"
 
       - name: Use default Xcode
         run: |
