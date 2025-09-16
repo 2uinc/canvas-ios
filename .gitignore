@@ -24,7 +24,7 @@ artifacts
 xctestrun/
 **/IDEWorkspaceChecks.plist
 Core/Core.xcodeproj/
-Student/Student.xcodeproj/
+#Student/Student.xcodeproj/
 Brewfile.lock
 
 # AppCode
