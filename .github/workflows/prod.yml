@@ -21,15 +21,13 @@ jobs:
       - name: Show available Xcode versions
         run: ls /Applications | grep Xcode
 
-      - name: Use default Xcode
-        run: |
-          echo "Using default Xcode path:"
-          xcode-select -p
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
-        with:
-          node-version: 18
+        # with:
+        #   node-version: 18
+
+      - name: Install Homebrew
+        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
       - name: Install dependencies
         run: yarn install
@@ -53,12 +51,17 @@ jobs:
           yarn build-secrets "bugfenderKey=${{ secrets.BUGFENDER_KEY }}"
 
 
+      - name: Use default Xcode
+        run: |
+          echo "Using default Xcode path:"
+          xcode-select -p
+
+
       - name: Install provisioning profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-        env:
-          IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
+       
 
           
       - name: Install signing certificate
