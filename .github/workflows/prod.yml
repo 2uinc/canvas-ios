@@ -26,8 +26,8 @@ jobs:
         # with:
         #   node-version: 18
 
-      - name: Install Homebrew
-        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      # - name: Install Homebrew
+      #   run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
       - name: Install dependencies
         run: yarn install
@@ -83,13 +83,13 @@ jobs:
           cd Student
           sed -i '' '/Widgets\.appex/d' Student.xcodeproj/project.pbxproj
           sed -i '' '/SubmitAssignment\.appex/d' Student.xcodeproj/project.pbxproj
-          # cd ..
+          cd ..
 
       - name: Disable automatic signing for target
         run: |
           ruby -e "
           require 'xcodeproj'
-          project_path = 'Student.xcodeproj'
+          project_path = 'canvas-ios/Student.xcodeproj'
           project = Xcodeproj::Project.open(project_path)
           target = project.targets.find { |t| t.name == 'SubmitAssignment' }
           target.build_configurations.each do |config|
@@ -97,7 +97,6 @@ jobs:
           end
           project.save
           "
-
           
       - name: Build the app
         run: |
