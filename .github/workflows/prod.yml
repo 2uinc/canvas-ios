@@ -85,8 +85,8 @@ jobs:
           sed -i '' '/SubmitAssignment\.appex/d' Student.xcodeproj/project.pbxproj
           cd ..
 
-      - name: Disable automatic signing for target
-        working-directory: /Users/runner/work/canvas-ios
+      - name: Disable automatic signing
+        working-directory: ${{ github.workspace }}
         run: |
           ruby -e "
           require 'xcodeproj'
