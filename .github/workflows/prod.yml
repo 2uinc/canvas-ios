@@ -83,7 +83,7 @@ jobs:
           cd Student
           sed -i '' '/Widgets\.appex/d' Student.xcodeproj/project.pbxproj
           sed -i '' '/SubmitAssignment\.appex/d' Student.xcodeproj/project.pbxproj
-          cd ..
+          # cd ..
 
       - name: Disable automatic signing for target
         run: |
