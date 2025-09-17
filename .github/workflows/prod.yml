@@ -3,7 +3,8 @@ name: iOS CI/CD
 
 on:
   push:
-    branches: ["develop", "features/cicd"]
+    # branches: ["develop", "features/cicd"]
+    branches: ["features/cicd"]
 
 jobs:
   build:
@@ -87,6 +88,13 @@ jobs:
 
       - name: Run Ruby script to disable signing
         run: ruby scripts/disable_auto_signing.rb
+
+      - name: Clean Xcode build
+        run: |
+          xcodebuild clean -project Student/Student.xcodeproj \
+                          -scheme SubmitAssignment \
+                          -sdk iphoneos \
+                          -configuration Release
         
           
       - name: Build the app
