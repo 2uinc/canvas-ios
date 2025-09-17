@@ -92,14 +92,14 @@ jobs:
       - name: Clean Xcode build
         run: |
           xcodebuild clean -project Student/Student.xcodeproj \
-                          -scheme SubmitAssignment \
+                          -scheme Student \
                           -sdk iphoneos \
                           -configuration Release
         
           
-      - name: Build the app
-        run: |
-          xcodebuild -workspace Canvas.xcworkspace -scheme Student -sdk iphoneos -configuration Release clean build
+      # - name: Build the app
+      #   run: |
+      #     xcodebuild -workspace Canvas.xcworkspace -scheme Student -sdk iphoneos -configuration Release clean build
 
       - name: Archive the app
         run: |
