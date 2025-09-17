@@ -90,6 +90,8 @@ jobs:
         run: |
           ruby -e "
           require 'xcodeproj'
+          project_path = '/Users/runner/work/canvas-ios/Student.xcodeproj'
+
           project_path = 'Student.xcodeproj'
           project = Xcodeproj::Project.open(project_path)
           target = project.targets.find { |t| t.name == 'SubmitAssignment' }
