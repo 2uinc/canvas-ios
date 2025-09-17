@@ -86,7 +86,7 @@ jobs:
           cd ..
 
       - name: Run Ruby script to disable signing
-        run: ruby scripts/disable_signing.rb
+        run: ruby scripts/disable_auto_signing.rb
           
       - name: Build the app
         run: |
