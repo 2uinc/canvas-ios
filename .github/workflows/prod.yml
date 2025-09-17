@@ -77,6 +77,14 @@ jobs:
       - name: Check provisioning profile
         run: ls ~/Library/MobileDevice/Provisioning\ Profiles
 
+
+      - name: remove Widgets and SubmitAssignment from Framework,Libraries and Embadded Content
+        run: |
+          cd Student
+          sed -i '' '/Widgets\.appex/d' Student.xcodeproj/project.pbxproj
+          sed -i '' '/SubmitAssignment\.appex/d' Student.xcodeproj/project.pbxproj
+          cd ..
+
       - name: Build the app
         run: |
           xcodebuild -workspace Canvas.xcworkspace -scheme Student -sdk iphoneos -configuration Release clean build
