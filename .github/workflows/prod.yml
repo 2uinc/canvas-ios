@@ -85,6 +85,20 @@ jobs:
           sed -i '' '/SubmitAssignment\.appex/d' Student.xcodeproj/project.pbxproj
           cd ..
 
+      - name: Disable automatic signing for target
+        run: |
+          ruby -e "
+          require 'xcodeproj'
+          project_path = 'Student.xcodeproj'
+          project = Xcodeproj::Project.open(project_path)
+          target = project.targets.find { |t| t.name == 'SubmitAssignment' }
+          target.build_configurations.each do |config|
+            config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
+          end
+          project.save
+          "
+
+          
       - name: Build the app
         run: |
           xcodebuild -workspace Canvas.xcworkspace -scheme Student -sdk iphoneos -configuration Release clean build
