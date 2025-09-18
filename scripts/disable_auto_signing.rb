@@ -1,13 +1,13 @@
-# require 'xcodeproj'
+require 'xcodeproj'
 
-# # === Configuration ===
-# project_path = 'Student/Student.xcodeproj'   
+# === Configuration ===
+project_path = 'Student/Student.xcodeproj'   
 
 # # === Load Project ===
 # project = Xcodeproj::Project.open(project_path)
 
 # # === Target names to update ===
-# target_names = ['SubmitAssignment', 'Widgets']
+# target_names = ['Student','SubmitAssignment', 'Widgets']
 
 # # === Process each target ===
 # target_names.each do |target_name|
@@ -31,67 +31,116 @@
 
 
 
-require 'xcodeproj'
-require 'pathname'
 
-# === CONFIGURATION ===
-project_path = 'Student/Student.xcodeproj'
-main_target_name = 'Student'  # Change if your main target has a different name
-extensions_to_remove = ['SubmitAssignment', 'Widgets']  # No file extensions here
 
-# === OPEN PROJECT ===
+
+
+
+
+
+
+
+# targets_to_delete = ['SubmitAssignment', 'Widgets']
+
+# project = Xcodeproj::Project.open(project_path)
+
+# targets_to_delete.each do |target_name|
+#   target = project.targets.find { |t| t.name == target_name }
+#   if target
+#     puts "Deleting target: #{target.name}"
+#     project.targets.delete(target)
+#   else
+#     puts "Target not found: #{target_name}"
+#   end
+# end
+
+# project.save
+
+
+
+targets_to_delete = ['SubmitAssignment', 'Widgets']
+
 project = Xcodeproj::Project.open(project_path)
 
-# === FIND MAIN TARGET ===
-main_target = project.targets.find { |t| t.name == main_target_name }
+# Remove target dependencies pointing to the targets to be deleted
+project.targets.each do |other_target|
+  next if targets_to_delete.include?(other_target.name)
 
-unless main_target
-  puts "❌ Main target '#{main_target_name}' not found."
-  exit 1
-end
-
-puts "📦 Found main target: #{main_target.name}"
-puts "🎯 Extensions to remove: #{extensions_to_remove.join(', ')}"
-
-# === HELPER METHOD ===
-def matches_extension?(file_name, targets_to_remove)
-  base = File.basename(file_name, File.extname(file_name))
-  targets_to_remove.include?(base)
-end
-
-# === DEBUG: LIST FILES BEFORE REMOVAL ===
-puts "\n📁 Files in 'Frameworks' phase:"
-main_target.frameworks_build_phases.files.each do |file|
-  puts " - #{file.display_name}"
-end
-
-puts "\n📁 Files in 'Embed Frameworks' (Copy Files) phases:"
-main_target.copy_files_build_phases.each_with_index do |phase, i|
-  phase.files.each do |file|
-    puts " - #{file.display_name}"
+  other_target.dependencies.delete_if do |dependency|
+    dependency.target && targets_to_delete.include?(dependency.target.name)
   end
 end
 
-# === REMOVE FROM FRAMEWORKS PHASE ===
-main_target.frameworks_build_phases.files.each do |file|
-  if matches_extension?(file.display_name, extensions_to_remove)
-    puts "🗑️ Removing #{file.display_name} from Frameworks"
-    file.remove_from_project
+# Delete the targets
+targets_to_delete.each do |target_name|
+  target = project.targets.find { |t| t.name == target_name }
+  if target
+    puts "Deleting target: #{target.name}"
+    project.targets.delete(target)
+  else
+    puts "Target not found: #{target_name}"
   end
 end
 
-# === REMOVE FROM EMBED FRAMEWORKS (COPY FILES) PHASES ===
-main_target.copy_files_build_phases.each do |phase|
-  phase.files.each do |file|
-    if matches_extension?(file.display_name, extensions_to_remove)
-      puts "🗑️ Removing #{file.display_name} from Embedded Content"
-      file.remove_from_project
+project.save
+
+
+
+# Target to modify
+target = project.targets.find { |t| t.name == 'Student' }
+raise "Target 'Student' not found" unless target
+
+# Items to remove
+items_to_remove = ['SubmitAssignment.appex', 'Widgets.appex']
+
+# Find the Embed App Extensions build phase
+embed_phase = target.copy_files_build_phases.find do |phase|
+  phase.symbol_dst_subfolder_spec == :plug_ins
+end
+
+if embed_phase
+  embed_phase.files.each do |build_file|
+    file_name = build_file.file_ref&.path
+    if file_name && items_to_remove.include?(File.basename(file_name))
+      puts "Removing #{file_name} from embedded content..."
+      embed_phase.remove_build_file(build_file)
     end
   end
+else
+  puts "No Embed App Extensions phase found in target 'Student'"
 end
 
-# === SAVE PROJECT ===
+# Save the project
 project.save
-puts "\n✅ Done. Removed specified extensions from linking and embedding."
+puts "Project saved successfully."
 
+
+
+# Target to modify
+target = project.targets.find { |t| t.name == 'Student' }
+raise "Target 'Student' not found" unless target
+
+# Items to remove
+items_to_remove = ['Widgets.appex']
+
+# Find the Embed App Extensions build phase
+embed_phase = target.copy_files_build_phases.find do |phase|
+  phase.symbol_dst_subfolder_spec == :plug_ins
+end
+
+if embed_phase
+  embed_phase.files.each do |build_file|
+    file_name = build_file.file_ref&.path
+    if file_name && items_to_remove.include?(File.basename(file_name))
+      puts "Removing #{file_name} from embedded content..."
+      embed_phase.remove_build_file(build_file)
+    end
+  end
+else
+  puts "No Embed App Extensions phase found in target 'Student'"
+end
+
+# Save the project
+project.save
+puts "Project saved successfully."
 
