@@ -78,14 +78,14 @@ jobs:
       - name: Check provisioning profile
         run: ls ~/Library/MobileDevice/Provisioning\ Profiles
 
-      - name: Build with Xcode
-        run: |
-          xcodebuild \
-            -workspace Canvas.xcworkspace \
-            -scheme Student \
-            PROVISIONING_PROFILE_SPECIFIER="profile" \
-            CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
-            clean build
+      # - name: Build with Xcode
+      #   run: |
+      #     xcodebuild \
+      #       -workspace Canvas.xcworkspace \
+      #       -scheme Student \
+      #       PROVISIONING_PROFILE_SPECIFIER="profile" \
+      #       CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
+      #       clean build
 
 
       # - name: remove Widgets and SubmitAssignment from Framework,Libraries and Embadded Content
@@ -106,13 +106,13 @@ jobs:
       #                     -configuration Release
         
           
-      # - name: Build the app
-      #   run: |
-      #     xcodebuild -workspace Canvas.xcworkspace -scheme Student -sdk iphoneos -configuration Release clean build
+      - name: Build the app
+        run: |
+          xcodebuild -workspace Canvas.xcworkspace -scheme Student -sdk iphoneos -configuration Release clean build
 
-      # - name: Archive the app
-      #   run: |
-      #     xcodebuild -workspace Canvas.xcworkspace -scheme Student -sdk iphoneos -configuration Release archive -archivePath $PWD/build/Student.xcarchive
+      - name: Archive the app
+        run: |
+          xcodebuild -workspace Canvas.xcworkspace -scheme Student -sdk iphoneos -configuration Release archive -archivePath $PWD/build/Student.xcarchive
 
       
       # - name: Build and archive
