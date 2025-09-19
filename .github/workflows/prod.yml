@@ -150,5 +150,3 @@ jobs:
                      CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
                      DEVELOPMENT_TEAM=58GH9WB284
 
-
-
