@@ -50,7 +50,9 @@ jobs:
           echo "Using default Xcode path:"
           xcode-select -p
 
-
+      - name: Run Ruby script to disable signing
+        run: ruby scripts/disable_auto_signing.rb
+          
       - name: Install provisioning profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
@@ -95,8 +97,7 @@ jobs:
       #     sed -i '' '/SubmitAssignment\.appex/d' Student.xcodeproj/project.pbxproj
       #     cd ..
 
-      # - name: Run Ruby script to disable signing
-      #   run: ruby scripts/disable_auto_signing.rb
+   
 
       # - name: Clean Xcode build
       #   run: |
