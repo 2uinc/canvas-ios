@@ -32,14 +32,6 @@ project.save
 
 
 
-
-
-
-
-
-
-
-
 # targets_to_delete = ['SubmitAssignment', 'Widgets']
 
 # project = Xcodeproj::Project.open(project_path)
@@ -143,4 +135,36 @@ end
 # Save the project
 project.save
 puts "Project saved successfully."
+
+
+
+
+# === Configuration ===
+project_path = 'Core/Core.xcodeproj'   
+
+# === Load Project ===
+project = Xcodeproj::Project.open(project_path)
+
+# === Target names to update ===
+target_names = ['Core']  # Adjust these names as needed
+
+# === Process each target ===
+target_names.each do |target_name|
+  target = project.targets.find { |t| t.name == target_name }
+
+  if target.nil?
+    puts "❌ Target '#{target_name}' not found in project."
+    next
+  end
+
+  # Disable automatic signing
+  target.build_configurations.each do |config|
+    config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
+  end
+
+  puts "✅ 'Automatically manage signing' disabled for target '#{target_name}'"
+end
+
+# Save the project once after all changes
+project.save
 
