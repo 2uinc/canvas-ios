@@ -118,7 +118,7 @@ jobs:
           -scheme Student \
           -configuration Release \
           -destination 'generic/platform=iOS' \
-          CODE_SIGN_IDENTITY="" \
+          CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
 
