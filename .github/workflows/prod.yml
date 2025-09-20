@@ -97,14 +97,16 @@ jobs:
       #     sed -i '' '/SubmitAssignment\.appex/d' Student.xcodeproj/project.pbxproj
       #     cd ..
 
-   
+      - name: Show code signing identity
+        run: security find-identity -v -p codesigning
 
-      # - name: Clean Xcode build
-      #   run: |
-      #     xcodebuild clean -project Student/Student.xcodeproj \
-      #                     -scheme Student \
-      #                     -sdk iphoneos \
-      #                     -configuration Release
+
+      - name: Clean Xcode build
+        run: |
+          xcodebuild clean -project Student/Student.xcodeproj \
+                          -scheme Student \
+                          -sdk iphoneos \
+                          -configuration Release
         
           
       # - name: Build the app
@@ -139,19 +141,17 @@ jobs:
       #       -archivePath ${{ github.workspace }}/build/Student.xcarchive
 
 
-      - name: Show code signing identity
-        run: security find-identity -v -p codesigning
+      
 
-
-      - name: Build and Archive
-        run: |
-          xcodebuild -workspace Canvas.xcworkspace \
-                     -scheme Student \
-                     -sdk iphoneos \
-                     -configuration Release \
-                     -archivePath $PWD/build/Student.xcarchive \
-                     PROVISIONING_PROFILE_SPECIFIER="profile" \
-                     CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
+      # - name: Build and Archive
+      #   run: |
+      #     xcodebuild -workspace Canvas.xcworkspace \
+      #                -scheme Student \
+      #                -sdk iphoneos \
+      #                -configuration Release \
+      #                -archivePath $PWD/build/Student.xcarchive \
+      #                PROVISIONING_PROFILE_SPECIFIER="profile" \
+      #                CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
 
       
 
