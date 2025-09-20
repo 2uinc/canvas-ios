@@ -143,15 +143,15 @@ jobs:
 
       
 
-      # - name: Build and Archive
-      #   run: |
-      #     xcodebuild -workspace Canvas.xcworkspace \
-      #                -scheme Student \
-      #                -sdk iphoneos \
-      #                -configuration Release \
-      #                -archivePath $PWD/build/Student.xcarchive \
-      #                PROVISIONING_PROFILE_SPECIFIER="profile" \
-      #                CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
+      - name: Archive the app
+        run: |
+          xcodebuild -workspace Canvas.xcworkspace \
+            -scheme Student \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $PWD/build/Student.xcarchive \
+            PROVISIONING_PROFILE_SPECIFIER="Profile" \
+            CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)"
 
       
 
