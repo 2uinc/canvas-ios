@@ -56,11 +56,21 @@ jobs:
       - name: Run Ruby script to disable signing
         run: ruby scripts/disable_auto_signing.rb
           
-      - name: Install provisioning profile
+      # - name: Install provisioning profile
+      #   run: |
+      #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+      #     echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+      - name: Install provisioning profile and extract UUID
+        id: profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-       
+          echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/profile.mobileprovision
+  
+          PROFILE_UUID=$(security cms -D -i ~/profile.mobileprovision | /usr/libexec/PlistBuddy -c 'Print UUID' /dev/stdin)
+          echo "Provisioning Profile UUID: $PROFILE_UUID"
+          cp ~/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
+  
+          echo "uuid=$PROFILE_UUID" >> $GITHUB_OUTPUT
 
           
       - name: Install signing certificate
@@ -73,11 +83,7 @@ jobs:
           security unlock-keychain -p "" build.keychain
 
 
-          # # Install provisioning profile
-          # mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          # UUID=$(security cms -D -i ~/certs/profile.mobileprovision | /usr/libexec/PlistBuddy -c 'Print UUID' /dev/stdin)
-          # cp ~/certs/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
-          # echo "Provisioning Profile UUID: $UUID"
+          
 
       - name: Verify code signing identities
         run: |
@@ -162,9 +168,8 @@ jobs:
             -archivePath $PWD/build/Student.xcarchive \
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM=$TEAM_ID \
-            PROVISIONING_PROFILE_SPECIFIER="profile" \
+            PROVISIONING_PROFILE=${{ steps.profile.outputs.uuid }} \
             PRODUCT_BUNDLE_IDENTIFIER=$BUNDLE_ID \
             OTHER_CODE_SIGN_FLAGS="--keychain build.keychain"
-
       
 
