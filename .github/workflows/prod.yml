@@ -60,22 +60,13 @@ jobs:
       #   run: |
       #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
       #     echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-      - name: Install provisioning profile and extract UUID
+      - name: Install provisioning 
         id: profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/profile.mobileprovision
   
-          cho "Decoded provisioning profile:"
-          file ~/profile.mobileprovision
-          ls -lh ~/profile.mobileprovision
-          cat ~/profile.mobileprovision | head -n 10 || true
           
-          PROFILE_UUID=$(security cms -D -i ~/profile.mobileprovision | /usr/libexec/PlistBuddy -c 'Print UUID' /dev/stdin)
-          echo "Provisioning Profile UUID: $PROFILE_UUID"
-          cp ~/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
-          
-          echo "uuid=$PROFILE_UUID" >> $GITHUB_OUTPUT
 
 
           
@@ -123,59 +114,14 @@ jobs:
         run: security find-identity -v -p codesigning
 
 
-      # - name: Clean Xcode build
-      #   run: |
-      #     xcodebuild clean -project Student/Student.xcodeproj \
-      #                     -scheme Student \
-      #                     -sdk iphoneos \
-      #                     -configuration Release
+      - name: Clean Xcode build
+        run: |
+          xcodebuild clean -project Student/Student.xcodeproj \
+                          -scheme Student \
+                          -sdk iphoneos \
+                          -configuration Release
         
           
-      # - name: Build the app
-      #   run: |
-      #     # xcodebuild -workspace Canvas.xcworkspace -scheme Student -sdk iphoneos -configuration Release clean build
-      #     # xcodebuild -workspace Canvas.xcworkspace -scheme Student -sdk iphoneos -configuration Release clean build \
-      #     # PROVISIONING_PROFILE_SPECIFIER="profile" \
-      #     # CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" 
-      #     xcodebuild \
-      #     -workspace Canvas.xcworkspace \
-      #     -scheme Student \
-      #     -configuration Release \
-      #     -destination 'generic/platform=iOS' \
-      #     CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
-      #     CODE_SIGNING_REQUIRED=NO \
-      #     CODE_SIGNING_ALLOWED=NO
-
-
-      # - name: Archive the app
-      #   run: |
-      #     xcodebuild -workspace Canvas.xcworkspace -scheme Student -sdk iphoneos -configuration Release archive -archivePath $PWD/build/Student.xcarchive
-
       
-      # - name: Build and archive
-      #   run: |
-      #     mkdir ${{ github.workspace }}/build
-      #     cd source
-      #     xcodebuild archive \
-      #       -scheme Student \
-      #       -configuration Debug \
-      #       -destination 'generic/platform=iOS' \
-      #       -archivePath ${{ github.workspace }}/build/Student.xcarchive
-
-
-      
-
-      - name: Archive the app
-        run: |
-          xcodebuild -workspace Canvas.xcworkspace \
-            -scheme Student \
-            -sdk iphoneos \
-            -configuration Release \
-            -archivePath $PWD/build/Student.xcarchive \
-            CODE_SIGN_STYLE=Manual \
-            DEVELOPMENT_TEAM=$TEAM_ID \
-            PROVISIONING_PROFILE=${{ steps.profile.outputs.uuid }} \
-            PRODUCT_BUNDLE_IDENTIFIER=$BUNDLE_ID \
-            OTHER_CODE_SIGN_FLAGS="--keychain build.keychain"
       
 
