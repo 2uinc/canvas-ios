@@ -93,33 +93,29 @@ jobs:
       - name: Check provisioning profile
         run: ls ~/Library/MobileDevice/Provisioning\ Profiles
 
-      # - name: Build with Xcode
-      #   run: |
-      #     xcodebuild \
-      #       -workspace Canvas.xcworkspace \
-      #       -scheme Student \
-      #       PROVISIONING_PROFILE_SPECIFIER="profile" \
-      #       CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
-      #       clean build
-
-
-      # - name: remove Widgets and SubmitAssignment from Framework,Libraries and Embadded Content
-      #   run: |
-      #     cd Student
-      #     sed -i '' '/Widgets\.appex/d' Student.xcodeproj/project.pbxproj
-      #     sed -i '' '/SubmitAssignment\.appex/d' Student.xcodeproj/project.pbxproj
-      #     cd ..
-
       - name: Show code signing identity
         run: security find-identity -v -p codesigning
 
-
-      - name: Clean Xcode build
+      - name: Build with Xcode
         run: |
-          xcodebuild clean -project Student/Student.xcodeproj \
-                          -scheme Student \
-                          -sdk iphoneos \
-                          -configuration Release
+          xcodebuild \
+            -workspace Canvas.xcworkspace \
+            -scheme Student \
+            PROVISIONING_PROFILE_SPECIFIER="profile" \
+            CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
+            clean build
+
+
+
+    
+
+
+      # - name: Clean Xcode build
+      #   run: |
+      #     xcodebuild clean -project Student/Student.xcodeproj \
+      #                     -scheme Student \
+      #                     -sdk iphoneos \
+      #                     -configuration Release
         
           
       
