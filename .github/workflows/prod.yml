@@ -66,11 +66,17 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/profile.mobileprovision
   
+          cho "Decoded provisioning profile:"
+          file ~/profile.mobileprovision
+          ls -lh ~/profile.mobileprovision
+          cat ~/profile.mobileprovision | head -n 10 || true
+          
           PROFILE_UUID=$(security cms -D -i ~/profile.mobileprovision | /usr/libexec/PlistBuddy -c 'Print UUID' /dev/stdin)
           echo "Provisioning Profile UUID: $PROFILE_UUID"
           cp ~/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
-  
+          
           echo "uuid=$PROFILE_UUID" >> $GITHUB_OUTPUT
+
 
           
       - name: Install signing certificate
