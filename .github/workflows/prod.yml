@@ -162,7 +162,7 @@ jobs:
             -archivePath $PWD/build/Student.xcarchive \
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM=$TEAM_ID \
-            PROVISIONING_PROFILE_SPECIFIER= "profile" \
+            PROVISIONING_PROFILE_SPECIFIER="profile" \
             PRODUCT_BUNDLE_IDENTIFIER=$BUNDLE_ID \
             OTHER_CODE_SIGN_FLAGS="--keychain build.keychain"
 
