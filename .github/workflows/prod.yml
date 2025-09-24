@@ -96,23 +96,23 @@ jobs:
       - name: Show code signing identity
         run: security find-identity -v -p codesigning
 
-      - name: Build with Xcode
-        run: |
-          xcodebuild \
-            -workspace Canvas.xcworkspace \
-            -scheme Student \
-            PROVISIONING_PROFILE_SPECIFIER="profile" \
-            CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
-            clean build
-
-
-
-      # - name: Clean Xcode build
+      # - name: Build with Xcode
       #   run: |
-      #     xcodebuild clean -project Student/Student.xcodeproj \
-      #                     -scheme Student \
-      #                     -sdk iphoneos \
-      #                     -configuration Release
+      #     xcodebuild \
+      #       -workspace Canvas.xcworkspace \
+      #       -scheme Student \
+      #       PROVISIONING_PROFILE_SPECIFIER="profile" \
+      #       CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
+      #       clean build
+
+
+
+      - name: Clean Xcode build
+        run: |
+          xcodebuild clean -project Student/Student.xcodeproj \
+                          -scheme Student \
+                          -sdk iphoneos \
+                          -configuration Release
 
 
 
