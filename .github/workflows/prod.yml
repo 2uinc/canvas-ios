@@ -96,14 +96,14 @@ jobs:
       - name: Show code signing identity
         run: security find-identity -v -p codesigning
 
-      # - name: Build with Xcode
-      #   run: |
-      #     xcodebuild \
-      #       -workspace Canvas.xcworkspace \
-      #       -scheme Student \
-      #       PROVISIONING_PROFILE_SPECIFIER="profile" \
-      #       CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
-      #       clean build
+      - name: Build with Xcode
+        run: |
+          xcodebuild \
+            -workspace Canvas.xcworkspace \
+            -scheme Student \
+            PROVISIONING_PROFILE_SPECIFIER="profile" \
+            CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
+            clean build
 
 
 
@@ -116,51 +116,51 @@ jobs:
 
 
 
-      - name: Install provisioning profile
-        id: provisioning
-        run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-          echo "$IOS_PROVISION_PROFILE" | base64 --decode > "$PROFILE_PATH"
+      # - name: Install provisioning profile
+      #   id: provisioning
+      #   run: |
+      #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+      #     PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+      #     echo "$IOS_PROVISION_PROFILE" | base64 --decode > "$PROFILE_PATH"
           
-          # Extract UUID from the profile
-          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i "$PROFILE_PATH"))
+      #     # Extract UUID from the profile
+      #     PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i "$PROFILE_PATH"))
           
-          # Move the profile to the correct path with UUID name
-          mv "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
+      #     # Move the profile to the correct path with UUID name
+      #     mv "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
       
-          echo "PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
+      #     echo "PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
 
 
-      - name: Archive iOS app using Xcode
-        run: |
-          xcodebuild archive \
-            -workspace Canvas.xcworkspace \
-            -scheme Student \
-            -configuration Release \
-            -archivePath ${{ github.workspace }}/build/Student.xcarchive \
-            CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (${TEAM_ID})" \
-            DEVELOPMENT_TEAM=${TEAM_ID} \
-            PRODUCT_BUNDLE_IDENTIFIER=${BUNDLE_ID} \
-            SKIP_INSTALL=NO \
-            BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+      # - name: Archive iOS app using Xcode
+      #   run: |
+      #     xcodebuild archive \
+      #       -workspace Canvas.xcworkspace \
+      #       -scheme Student \
+      #       -configuration Release \
+      #       -archivePath ${{ github.workspace }}/build/Student.xcarchive \
+      #       CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (${TEAM_ID})" \
+      #       DEVELOPMENT_TEAM=${TEAM_ID} \
+      #       PRODUCT_BUNDLE_IDENTIFIER=${BUNDLE_ID} \
+      #       SKIP_INSTALL=NO \
+      #       BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
 
 
 
-      - name: Export .ipa from archive (optional)
-        run: |
-          mkdir -p ${{ github.workspace }}/build/export
-          xcodebuild -exportArchive \
-            -archivePath ${{ github.workspace }}/build/Student.xcarchive \
-            -exportPath ${{ github.workspace }}/build/export \
-            -exportOptionsPlist exportOptions.plist
+      # - name: Export .ipa from archive (optional)
+      #   run: |
+      #     mkdir -p ${{ github.workspace }}/build/export
+      #     xcodebuild -exportArchive \
+      #       -archivePath ${{ github.workspace }}/build/Student.xcarchive \
+      #       -exportPath ${{ github.workspace }}/build/export \
+      #       -exportOptionsPlist exportOptions.plist
 
-      - name: Upload .ipa artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Student.ipa
-          path: build/export/*.ipa
+      # - name: Upload .ipa artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: Student.ipa
+      #     path: build/export/*.ipa
           
       
       
