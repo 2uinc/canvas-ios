@@ -1,9 +1,7 @@
-
 name: iOS CI/CD
 
 on:
   push:
-    # branches: ["develop", "features/cicd"]
     branches: ["features/cicd"]
 
 jobs:
@@ -22,16 +20,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4  
 
-      - name: Show available Xcode versions
-        run: ls /Applications | grep Xcode
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
-        # with:
-        #   node-version: 18
-
-      # - name: Install Homebrew
-      #   run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
       - name: Install dependencies
         run: yarn install
@@ -45,76 +35,8 @@ jobs:
       - name: Build secrets 
         run: |
           yarn build-secrets "awsAccessKey=${{ secrets.AWS_ACCESS_KEY }}" "awsSecretKey=${{ secrets.AWS_SECRET_KEY }}"
-           yarn build-secrets "customPushDomain=${{ secrets.CUSTOM_PUSH_DOMAIN }}"
-           yarn build-secrets "bugfenderKey=${{ secrets.BUGFENDER_KEY }}"
-
-      - name: Use default Xcode
-        run: |
-          echo "Using default Xcode path:"
-          xcode-select -p
-
-      - name: Run Ruby script to disable signing
-        run: ruby scripts/disable_auto_signing.rb
-          
-      # - name: Install provisioning profile
-      #   run: |
-      #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-      #     echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-      - name: Install provisioning 
-        id: profile
-        run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/profile.mobileprovision
-  
-          
-
-
-          
-      - name: Install signing certificate
-        run: |
-          echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
-          security create-keychain -p "" build.keychain
-          security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-          security list-keychains -s build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-
-
-          
-
-      - name: Verify code signing identities
-        run: |
-          echo "Listing available code signing identities..."
-          security find-identity -v -p codesigning
-          
-      - name: List certificates in keychain
-        run: security list-keychains && security show-keychain-info build.keychain
-  
-      - name: Check provisioning profile
-        run: ls ~/Library/MobileDevice/Provisioning\ Profiles
-
-      - name: Show code signing identity
-        run: security find-identity -v -p codesigning
-
-      # - name: Build with Xcode
-      #   run: |
-      #     xcodebuild \
-      #       -workspace Canvas.xcworkspace \
-      #       -scheme Student \
-      #       PROVISIONING_PROFILE_SPECIFIER="profile" \
-      #       CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
-      #       clean build
-
-
-
-      # - name: Clean Xcode build
-      #   run: |
-      #     xcodebuild clean -project Student/Student.xcodeproj \
-      #                     -scheme Student \
-      #                     -sdk iphoneos \
-      #                     -configuration Release
-
-
+          yarn build-secrets "customPushDomain=${{ secrets.CUSTOM_PUSH_DOMAIN }}"
+          yarn build-secrets "bugfenderKey=${{ secrets.BUGFENDER_KEY }}"
 
       - name: Install provisioning profile
         id: provisioning
@@ -128,9 +50,16 @@ jobs:
           
           # Move the profile to the correct path with UUID name
           mv "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
-      
           echo "PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
 
+      - name: Install signing certificate
+        run: |
+          echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
+          security create-keychain -p "" build.keychain
+          security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security list-keychains -s build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
 
       - name: Archive iOS app using Xcode
         run: |
@@ -139,28 +68,26 @@ jobs:
             -scheme Student \
             -configuration Release \
             -archivePath ${{ github.workspace }}/build/Student.xcarchive \
+            -allowProvisioningUpdates \
             CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (${TEAM_ID})" \
             DEVELOPMENT_TEAM=${TEAM_ID} \
             PRODUCT_BUNDLE_IDENTIFIER=${BUNDLE_ID} \
+            CODE_SIGN_STYLE="Manual" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
             SKIP_INSTALL=NO \
             BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
-
-
-
-      - name: Export .ipa from archive (optional)
+      - name: Export .ipa from archive
         run: |
           mkdir -p ${{ github.workspace }}/build/export
           xcodebuild -exportArchive \
             -archivePath ${{ github.workspace }}/build/Student.xcarchive \
             -exportPath ${{ github.workspace }}/build/export \
-            -exportOptionsPlist exportOptions.plist
+            -exportOptionsPlist exportOptions.plist \
+            -allowProvisioningUpdates
 
       - name: Upload .ipa artifact
         uses: actions/upload-artifact@v4
         with:
           name: Student.ipa
           path: build/export/*.ipa
-          
-      
-
