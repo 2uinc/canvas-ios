@@ -56,54 +56,54 @@ jobs:
       - name: Run Ruby script to disable signing
         run: ruby scripts/disable_auto_signing.rb
           
-      # # - name: Install provisioning profile
-      # #   run: |
-      # #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-      # #     echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-      # - name: Install provisioning 
-      #   id: profile
+      # - name: Install provisioning profile
       #   run: |
       #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-      #     echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/profile.mobileprovision
+      #     echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+      - name: Install provisioning 
+        id: profile
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$IOS_PROVISION_PROFILE" | base64 --decode > ~/profile.mobileprovision
   
           
 
 
           
-      # - name: Install signing certificate
-      #   run: |
-      #     echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
-      #     security create-keychain -p "" build.keychain
-      #     security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-      #     security list-keychains -s build.keychain
-      #     security default-keychain -s build.keychain
-      #     security unlock-keychain -p "" build.keychain
+      - name: Install signing certificate
+        run: |
+          echo "$IOS_CERTIFICATE" | base64 --decode > certificate.p12
+          security create-keychain -p "" build.keychain
+          security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security list-keychains -s build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
 
 
           
 
-      # - name: Verify code signing identities
-      #   run: |
-      #     echo "Listing available code signing identities..."
-      #     security find-identity -v -p codesigning
+      - name: Verify code signing identities
+        run: |
+          echo "Listing available code signing identities..."
+          security find-identity -v -p codesigning
           
-      # - name: List certificates in keychain
-      #   run: security list-keychains && security show-keychain-info build.keychain
+      - name: List certificates in keychain
+        run: security list-keychains && security show-keychain-info build.keychain
   
-      # - name: Check provisioning profile
-      #   run: ls ~/Library/MobileDevice/Provisioning\ Profiles
+      - name: Check provisioning profile
+        run: ls ~/Library/MobileDevice/Provisioning\ Profiles
 
-      # - name: Show code signing identity
-      #   run: security find-identity -v -p codesigning
+      - name: Show code signing identity
+        run: security find-identity -v -p codesigning
 
-      # # - name: Build with Xcode
-      # #   run: |
-      # #     xcodebuild \
-      # #       -workspace Canvas.xcworkspace \
-      # #       -scheme Student \
-      # #       PROVISIONING_PROFILE_SPECIFIER="profile" \
-      # #       CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
-      # #       clean build
+      # - name: Build with Xcode
+      #   run: |
+      #     xcodebuild \
+      #       -workspace Canvas.xcworkspace \
+      #       -scheme Student \
+      #       PROVISIONING_PROFILE_SPECIFIER="profile" \
+      #       CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
+      #       clean build
 
 
 
@@ -116,82 +116,51 @@ jobs:
 
 
 
-      # - name: Install provisioning profile
-      #   id: provisioning
-      #   run: |
-      #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-      #     PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-      #     echo "$IOS_PROVISION_PROFILE" | base64 --decode > "$PROFILE_PATH"
-          
-      #     # Extract UUID from the profile
-      #     PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i "$PROFILE_PATH"))
-          
-      #     # Move the profile to the correct path with UUID name
-      #     mv "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
-      
-      #     echo "PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
-
-
-      # - name: Archive iOS app using Xcode
-      #   run: |
-      #     xcodebuild archive \
-      #       -workspace Canvas.xcworkspace \
-      #       -scheme Student \
-      #       -configuration Release \
-      #       -archivePath ${{ github.workspace }}/build/Student.xcarchive \
-      #       CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (${TEAM_ID})" \
-      #       DEVELOPMENT_TEAM=${TEAM_ID} \
-      #       PRODUCT_BUNDLE_IDENTIFIER=${BUNDLE_ID} \
-      #       SKIP_INSTALL=NO \
-      #       BUILD_LIBRARY_FOR_DISTRIBUTION=YES
-
-
-
-
-      # - name: Export .ipa from archive (optional)
-      #   run: |
-      #     mkdir -p ${{ github.workspace }}/build/export
-      #     xcodebuild -exportArchive \
-      #       -archivePath ${{ github.workspace }}/build/Student.xcarchive \
-      #       -exportPath ${{ github.workspace }}/build/export \
-      #       -exportOptionsPlist exportOptions.plist
-
-      # - name: Upload .ipa artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: Student.ipa
-      #     path: build/export/*.ipa
-          
-      # 🔹 Setup Keychain + Certificate
-      - name: Install Certificate
-        run: |
-          CERT_PATH=$RUNNER_TEMP/dist_cert.p12
-          echo "${CERTIFICATE_P12}" | base64 --decode > $CERT_PATH
-          security create-keychain -p "" build.keychain
-          security import $CERT_PATH -P "${CERTIFICATE_PASSWORD}" -A -t cert -f pkcs12 -k ~/Library/Keychains/build.keychain
-          security list-keychains -s ~/Library/Keychains/build.keychain
-          security default-keychain -s ~/Library/Keychains/build.keychain
-          security unlock-keychain -p "" ~/Library/Keychains/build.keychain
-          security set-keychain-settings -t 3600 -l ~/Library/Keychains/build.keychain
-
-      - name: Install Provisioning Profile
+      - name: Install provisioning profile
+        id: provisioning
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/${PROFILE_NAME}.mobileprovision
-          echo "${{ secrets.PROVISIONING_PROFILE }}" | base64 --decode > "$PROFILE_PATH"
+          PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          echo "$IOS_PROVISION_PROFILE" | base64 --decode > "$PROFILE_PATH"
+          
+          # Extract UUID from the profile
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i "$PROFILE_PATH"))
+          
+          # Move the profile to the correct path with UUID name
+          mv "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
+      
+          echo "PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
 
-      # 🔹 Archive
-      - name: Build Archive
+
+      - name: Archive iOS app using Xcode
         run: |
-          xcodebuild \
-            -workspace Student/Student.xcworkspace \
+          xcodebuild archive \
+            -workspace Canvas.xcworkspace \
             -scheme Student \
-            -sdk iphoneos \
             -configuration Release \
-            -archivePath $RUNNER_TEMP/Student.xcarchive \
-            CODE_SIGN_IDENTITY="Apple Distribution" \
+            -archivePath ${{ github.workspace }}/build/Student.xcarchive \
+            CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (${TEAM_ID})" \
             DEVELOPMENT_TEAM=${TEAM_ID} \
             PRODUCT_BUNDLE_IDENTIFIER=${BUNDLE_ID} \
-            clean archive | xcpretty
+            SKIP_INSTALL=NO \
+            BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+
+
+
+
+      - name: Export .ipa from archive (optional)
+        run: |
+          mkdir -p ${{ github.workspace }}/build/export
+          xcodebuild -exportArchive \
+            -archivePath ${{ github.workspace }}/build/Student.xcarchive \
+            -exportPath ${{ github.workspace }}/build/export \
+            -exportOptionsPlist exportOptions.plist
+
+      - name: Upload .ipa artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Student.ipa
+          path: build/export/*.ipa
+          
       
 
