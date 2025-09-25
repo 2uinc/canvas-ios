@@ -80,6 +80,7 @@ jobs:
 
           
       - name: Archive
+        run: |
           xcodebuild \
           -workspace Canvas.xcworkspace \
           -scheme Student \
