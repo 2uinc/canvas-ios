@@ -67,17 +67,18 @@ jobs:
           ruby scripts/fix_signing.rb
 
 
-      - name: Build and Archive
-        run: |
-          xcodebuild \
-          -workspace Canvas.xcworkspace \
-          -scheme Student \
-          -configuration Debug \
-          -destination 'generic/platform=iOS' \
-          CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
-          CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO
-
+      # - name: Build
+      #   run: |
+      #     xcodebuild \
+      #     -workspace Canvas.xcworkspace \
+      #     -scheme Student \
+      #     -configuration Debug \
+      #     -destination 'generic/platform=iOS' \
+      #     CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
+      #     CODE_SIGNING_REQUIRED=NO \
+      #     CODE_SIGNING_ALLOWED=NO
+          
+      - name: Archive
           xcodebuild \
           -workspace Canvas.xcworkspace \
           -scheme Student \
