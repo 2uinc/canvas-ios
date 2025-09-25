@@ -72,7 +72,7 @@ jobs:
           xcodebuild archive \
             -workspace Canvas.xcworkspace \
             -scheme Student \
-            -configuration Release \
+            -configuration Debug \
             -archivePath ${{ github.workspace }}/build/Student.xcarchive \
             -allowProvisioningUpdates \
             PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
