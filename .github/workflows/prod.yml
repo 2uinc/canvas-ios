@@ -69,12 +69,20 @@ jobs:
 
       - name: Build
         run: |
+          # xcodebuild \
+          #  -workspace Canvas.xcworkspace \
+          #  -scheme Student \
+          #  -configuration Debug \
+          #  -archivePath ${{ github.workspace }}/build/Student.xcarchive \
+          #  archive
           xcodebuild \
-           -workspace Canvas.xcworkspace \
-           -scheme Student \
-           -configuration Debug \
-           -archivePath ${{ github.workspace }}/build/Student.xcarchive \
-           archive
+          -workspace Canvas.xcworkspace \
+          -scheme Student \
+          -configuration Debug \
+          -destination 'generic/platform=iOS' \
+          CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
 
       - name: Export .ipa from archive
         run: |
