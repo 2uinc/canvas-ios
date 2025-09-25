@@ -63,8 +63,9 @@ jobs:
 
       - name: Fix signing settings for SPM packages
         run: |
-          ruby scripts/fix_signing.rb
           ruby scripts/disable_auto_signing.rb
+          ruby scripts/fix_signing.rb
+          
 
       - name: Archive iOS app using Xcode
         run: |
