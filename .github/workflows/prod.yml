@@ -67,7 +67,7 @@ jobs:
           ruby scripts/fix_signing.rb
 
 
-      - name: Build and export IPA
+      - name: Build
         run: |
           xcodebuild \
            -workspace Canvas.xcworkspace \
@@ -76,7 +76,67 @@ jobs:
            -archivePath ${{ github.workspace }}/build/Student.xcarchive \
            archive
 
+      - name: Export .ipa from archive
+        run: |
+          mkdir -p ${{ github.workspace }}/build/export
+          
+          # Create export options plist
+          cat > exportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>$TEAM_ID</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>$BUNDLE_ID</key>
+                  <string>$PROFILE_UUID</string>
+              </dict>
+          </dict>
+          </plist>
+          EOF
+          
+          xcodebuild -exportArchive \
+            -archivePath ${{ github.workspace }}/build/Student.xcarchive \
+            -exportPath ${{ github.workspace }}/build/export \
+            -exportOptionsPlist exportOptions.plist \
+            -allowProvisioningUpdates
 
+
+      # - name: Upload .ipa artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: Student.ipa
+      #     path: build/export/*.ipa
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Student-Degrees
+          path: ${{ github.workspace }}/source/build/export
+
+      - name: Clean up certificates and keychains
+        if: always()
+        run: |
+          echo "=== Cleaning up certificates and keychains ==="
+          
+          # Delete the temporary keychain
+          security delete-keychain build.keychain || true
+          
+          # Remove certificate files
+          rm -f certificate.p12 || true
+          rm -f exportOptions.plist || true
+          
+          # Remove provisioning profiles (optional)
+          # rm -f ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision || true
+          
+          # Reset keychain list to default
+          security list-keychains -s login.keychain
+            
 
       # - name: Archive iOS app using Xcode
       #   run: |
