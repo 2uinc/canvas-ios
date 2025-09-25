@@ -67,14 +67,8 @@ jobs:
           ruby scripts/fix_signing.rb
 
 
-      - name: Build
+      - name: Build and Archive
         run: |
-          # xcodebuild \
-          #  -workspace Canvas.xcworkspace \
-          #  -scheme Student \
-          #  -configuration Debug \
-          #  -archivePath ${{ github.workspace }}/build/Student.xcarchive \
-          #  archive
           xcodebuild \
           -workspace Canvas.xcworkspace \
           -scheme Student \
@@ -83,6 +77,13 @@ jobs:
           CODE_SIGN_IDENTITY="Apple Distribution: 2U, Inc. (58GH9WB284)" \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
+
+          xcodebuild \
+          -workspace Canvas.xcworkspace \
+          -scheme Student \
+          -configuration Debug \
+          -archivePath ${{ github.workspace }}/build \
+          -archive
 
       - name: Export .ipa from archive
         run: |
@@ -108,6 +109,8 @@ jobs:
           </dict>
           </plist>
           EOF
+
+          
           
           xcodebuild -exportArchive \
             -archivePath ${{ github.workspace }}/build/Student.xcarchive \
