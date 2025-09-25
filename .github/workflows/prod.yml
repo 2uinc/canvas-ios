@@ -69,7 +69,6 @@ jobs:
 
       - name: Build and export IPA
         run: |
-          cd source
           xcodebuild \
            -workspace Canvas.xcworkspace \
            -scheme Student \
