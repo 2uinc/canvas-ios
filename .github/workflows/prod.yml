@@ -86,7 +86,7 @@ jobs:
           -scheme Student \
           -configuration Debug \
           -archivePath ${{ github.workspace }}/build \
-          -archive
+          archive
 
       - name: Export .ipa from archive
         run: |
