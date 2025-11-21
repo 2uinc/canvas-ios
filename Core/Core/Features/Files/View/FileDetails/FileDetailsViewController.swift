@@ -521,7 +521,7 @@ extension FileDetailsViewController: URLSessionDownloadDelegate, LocalFileURLCre
         case (_, "model/vnd.usdz+zip"), ("zip", _):
             embedQLThumbnail()
         case ("pdf", _):
-            embedPDFView(for: localURL)
+            embedWebView(for: localURL)
         case ("video", _):
             embedVideoView(for: localURL)
         default:
