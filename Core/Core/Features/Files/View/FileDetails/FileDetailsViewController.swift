@@ -518,10 +518,10 @@ extension FileDetailsViewController: URLSessionDownloadDelegate, LocalFileURLCre
             embedAudioView(for: localURL)
         case ("image", _), (_, "image/heic"):
             embedImageOrWebView(for: localURL)
-        case (_, "model/vnd.usdz+zip"):
+        case (_, "model/vnd.usdz+zip"), ("zip", _):
             embedQLThumbnail()
         case ("pdf", _):
-            embedPDFView(for: localURL)
+            embedWebView(for: localURL)
         case ("video", _):
             embedVideoView(for: localURL)
         default:
