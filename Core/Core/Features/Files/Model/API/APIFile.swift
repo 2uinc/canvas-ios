@@ -21,7 +21,6 @@ import Foundation
 // https://canvas.instructure.com/doc/api/files.html#filePath
 public struct APIFile: Codable, Equatable {
     let id: ID
-    let uuid: String
     let folder_id: ID
     let display_name: String
     let filename: String
@@ -54,7 +53,6 @@ public struct APIFile: Codable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case id
-        case uuid
         case folder_id
         case display_name
         case filename
@@ -82,7 +80,6 @@ public struct APIFile: Codable, Equatable {
 
     init(
         id: ID,
-        uuid: String,
         folder_id: ID,
         display_name: String,
         filename: String,
@@ -108,7 +105,6 @@ public struct APIFile: Codable, Equatable {
         visibility_level: String?
     ) {
         self.id = id
-        self.uuid = uuid
         self.folder_id = folder_id
         self.display_name = display_name
         self.filename = filename
@@ -137,7 +133,6 @@ public struct APIFile: Codable, Equatable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(ID.self, forKey: .id)
-        uuid = try container.decode(String.self, forKey: .uuid)
         folder_id = try container.decode(ID.self, forKey: .folder_id)
         display_name = try container.decode(String.self, forKey: .display_name)
         contentType = try container.decode(String.self, forKey: .contentType)
@@ -251,7 +246,6 @@ public extension APIFile {
     ) -> APIFile {
         return APIFile(
             id: id,
-            uuid: uuid,
             folder_id: folder_id,
             display_name: display_name,
             filename: filename,

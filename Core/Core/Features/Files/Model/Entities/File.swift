@@ -42,7 +42,6 @@ final public class File: NSManagedObject {
     }
 
     @NSManaged public var id: String?
-    @NSManaged public var uuid: String?
     @NSManaged public var folderID: String?
     @NSManaged public var displayName: String?
     @NSManaged public var filename: String
@@ -174,7 +173,6 @@ extension File: WriteableModel {
     public static func save(_ item: APIFile, to model: File?, in client: NSManagedObjectContext) -> File {
         let model = model ?? client.first(where: #keyPath(File.id), equals: item.id.value) ?? client.insert()
         model.id = item.id.value
-        model.uuid = item.uuid
         model.folderID = item.folder_id.value
         model.displayName = item.display_name
         model.filename = item.filename
