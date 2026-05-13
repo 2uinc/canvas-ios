@@ -1,5 +1,5 @@
 {
-  "originHash" : "52ad3a423d41def8c859710c6e67b336edeba55536cb345d35f8ff93685e5bba",
+  "originHash" : "2610361de2dfa10c07ffc49a766a8a722fed6cc55ba770d823e34a176770c127",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -150,8 +150,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/2uinc/mobile-offline-downloader-ios.git",
       "state" : {
-        "branch" : "task/GSDM-508/fix_for_realm_version_issue",
-        "revision" : "ac4c70782a9550e7c855914bcac10baf258e326e"
+        "branch" : "downgrade_realm_version",
+        "revision" : "ea2f4831ef8b5ee523346cbc2a7df09abe1671f5"
       }
     },
     {

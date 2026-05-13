@@ -38,7 +38,7 @@ packages:
     branch: master
   mobile-offline-downloader-ios:
     url: https://github.com/2uinc/mobile-offline-downloader-ios.git
-    branch: "task/GSDM-508/fix_for_realm_version_issue"
+    branch: downgrade_realm_version
   SwiftUIIntrospect:
     url: https://github.com/siteline/swiftui-introspect.git
     exactVersion: 1.1.1
