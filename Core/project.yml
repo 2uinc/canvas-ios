@@ -38,7 +38,7 @@ packages:
     branch: master
   mobile-offline-downloader-ios:
     url: https://github.com/2uinc/mobile-offline-downloader-ios.git
-    branch: downgrade_realm_version
+    branch: "task/GSDM-508/fix_for_realm_version_issue"
   SwiftUIIntrospect:
     url: https://github.com/siteline/swiftui-introspect.git
     exactVersion: 1.1.1
@@ -46,7 +46,7 @@ packages:
     url: https://github.com/httpswift/swifter
     version: 1.5.0
 targets:
-  Core:    
+  Core:
     type: framework
     platform: iOS
     sources:
@@ -68,7 +68,7 @@ targets:
           - $(SRCROOT)/.swiftlint.yml
     settings:
       SWIFT_EMIT_LOC_STRINGS: true
-  CoreTests:    
+  CoreTests:
     type: bundle.unit-test
     platform: iOS
     settings:
