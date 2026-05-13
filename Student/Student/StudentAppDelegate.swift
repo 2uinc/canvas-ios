@@ -22,6 +22,8 @@ import AWSSNS
 import BugfenderSDK
 import Combine
 import Core
+import DatadogCore
+import DatadogRUM
 import Firebase
 import PSPDFKit
 import UIKit
@@ -55,6 +57,7 @@ class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDele
             CourseSyncBackgroundUpdatesAssembly.makeOfflineSyncBackgroundTask()
         }
         BackgroundProcessingAssembly.resolveInteractor().register(taskID: OfflineSyncBackgroundTaskRequest.ID)
+        setupDatadog()
         setupFirebase()
         CacheManager.resetAppIfNecessary()
 
@@ -107,6 +110,34 @@ class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDele
     func setupBugfender() {
         guard let bugfenderKey = Secret.bugfenderKey.string else { return }
         Bugfender.activateLogger(bugfenderKey)
+    }
+
+    func setupDatadog() {
+        guard let appID = Secret.datadogAppID.string, let clientToken = Secret.datadogClientToken.string else { return }
+        
+        #if DEBUG
+        let environment = "debug"
+        #else
+        let environment = "production"
+        #endif
+
+        Datadog.initialize(
+            with: Datadog.Configuration(
+                clientToken: clientToken,
+                env: environment,
+                service: "ios-degrees",
+                backgroundTasksEnabled: true
+            ),
+            trackingConsent: .granted
+        )
+
+        RUM.enable(
+            with: RUM.Configuration(
+                applicationID: appID,
+                uiKitViewsPredicate: DefaultUIKitRUMViewsPredicate(),
+                uiKitActionsPredicate: DefaultUIKitRUMActionsPredicate()
+            )
+        )
     }
 
     func setup(session: LoginSession) {
