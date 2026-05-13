@@ -52,3 +52,6 @@ packages:
   Realm:
     url: https://github.com/realm/realm-swift.git
     exactVersion: 20.0.4
+  DataDog:
+    url: https://github.com/Datadog/dd-sdk-ios.git
+    exactVersion: 3.10.0

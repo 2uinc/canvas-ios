@@ -33,6 +33,24 @@ targets:
         product: RealmSwift
         embed: true
         codeSign: true
+      - package: DataDog
+        product: DatadogCore
+      - package: DataDog
+        product: DatadogLogs
+      - package: DataDog
+        product: DatadogTrace
+      - package: DataDog
+        product: DatadogRUM
+      - package: DataDog
+        product: DatadogSessionReplay
+      - package: DataDog
+        product: DatadogCrashReporting
+      - package: DataDog
+        product: DatadogWebViewTracking
+      - package: DataDog
+        product: DatadogFlags
+      - package: DataDog
+        product: DatadogProfiling
       - target: Core/Core
       - target: SubmitAssignment
       - target: Widgets
