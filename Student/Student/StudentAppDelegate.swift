@@ -24,10 +24,12 @@ import Combine
 import Core
 import DatadogCore
 import DatadogRUM
+import DatadogCrashReporting
 import Firebase
 import PSPDFKit
 import UIKit
 import UserNotifications
+import DatadogLogs
 
 @UIApplicationMain
 class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDelegate {
@@ -131,13 +133,19 @@ class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDele
             trackingConsent: .granted
         )
 
+        CrashReporting.enable()
+
         RUM.enable(
             with: RUM.Configuration(
                 applicationID: appID,
                 uiKitViewsPredicate: DefaultUIKitRUMViewsPredicate(),
-                uiKitActionsPredicate: DefaultUIKitRUMActionsPredicate()
+                uiKitActionsPredicate: DefaultUIKitRUMActionsPredicate(),
+                appHangThreshold: 0.25,
+                trackWatchdogTerminations: true
             )
         )
+
+        Logs.enable()
     }
 
     func setup(session: LoginSession) {
