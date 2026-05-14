@@ -116,7 +116,7 @@ class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDele
 
     func setupDatadog() {
         guard let appID = Secret.datadogAppID.string, let clientToken = Secret.datadogClientToken.string else { return }
-        
+
         #if DEBUG
         let environment = "debug"
         #else
@@ -285,7 +285,7 @@ class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDele
     }
 
     // If the application is launched from the background, we pass the completion from the `handleEventsForBackgroundURLSession` function.
-    // If the application is launched normally, we don't need to pass system completion, the url session will tear down when it's finished. 
+    // If the application is launched normally, we don't need to pass system completion, the url session will tear down when it's finished.
     private func setupFileSubmissionAssemblyForBackgroundUploads(completion: (() -> Void)?) {
         let backgroundAssembly = FileSubmissionAssembly.makeShareExtensionAssembly()
         backgroundAssembly.connectToBackgroundURLSession {

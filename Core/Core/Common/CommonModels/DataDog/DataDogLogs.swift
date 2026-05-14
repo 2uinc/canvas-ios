@@ -17,17 +17,18 @@
 //
 
 import Foundation
+import DatadogCore
 import DatadogLogs
 
-class DataDogLogs {
-    static let shared: DataDogLogs = DataDogLogs()
+public class DataDogLogs {
+    public static let shared = DataDogLogs()
 
-    private let logger: any DatadogLogs.LoggerProtocol
+    private var _logger: DatadogLogs.LoggerProtocol?
 
-    /// Private initializer to centralize configuration
-    private init() {
-        // Configure your Datadog Logger
-        self.logger = DatadogLogs.Logger.create (
+    private var logger: DatadogLogs.LoggerProtocol? {
+        if let _logger { return _logger }
+        guard Datadog.isInitialized() else { return nil }
+        _logger = DatadogLogs.Logger.create(
             with: DatadogLogs.Logger.Configuration(
                 name: "IOS",
                 networkInfoEnabled: true,
@@ -35,10 +36,18 @@ class DataDogLogs {
                 consoleLogFormat: .shortWith(prefix: "[iOS App] ")
             )
         )
+        return _logger
     }
 
-    func log(info: String) {
-        logger.info(info, attributes: ["context": "onboarding flow"])
-        Thread.sleep(forTimeInterval: 1)
+    public func log(info: String, context: [String: Encodable]? = nil) {
+        guard let logger else {
+            print("⚠️ DatadogLogs logger not available. Message: \(info)")
+            return
+        }
+
+        var attributes = context ?? [:]
+        attributes["context"] = "onboarding flow"
+
+        logger.info(info, attributes: attributes)
     }
 }
