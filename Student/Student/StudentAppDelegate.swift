@@ -629,7 +629,23 @@ extension StudentAppDelegate {
                 swiftUIActionsPredicate: DefaultSwiftUIRUMActionsPredicate(isLegacyDetectionEnabled: true),
                 urlSessionTracking: RUM.Configuration.URLSessionTracking(),
                 appHangThreshold: 0.25,
-                trackWatchdogTerminations: true
+                trackWatchdogTerminations: true,
+                resourceEventMapper: { resourceEvent in
+                    var resourceEvent = resourceEvent
+                    resourceEvent.resource.url = SensitiveDataRedactor.redact(resourceEvent.resource.url)
+                    return resourceEvent
+                },
+                errorEventMapper: { errorEvent in
+                    var errorEvent = errorEvent
+                    // Redact error message
+                    errorEvent.error.message = SensitiveDataRedactor.redact(errorEvent.error.message)
+                    // Redact resource URL if present
+                    if var resource = errorEvent.error.resource {
+                        resource.url = SensitiveDataRedactor.redact(resource.url)
+                        errorEvent.error.resource = resource
+                    }
+                    return errorEvent
+                }
             )
         )
 
