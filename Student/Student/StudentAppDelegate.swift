@@ -613,7 +613,7 @@ extension StudentAppDelegate {
             with: Datadog.Configuration(
                 clientToken: clientToken,
                 env: environment,
-                service: "ios-degrees",
+                service: "degrees-mobile",
                 backgroundTasksEnabled: true
             ),
             trackingConsent: .granted
