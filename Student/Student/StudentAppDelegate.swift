@@ -650,6 +650,10 @@ extension StudentAppDelegate {
                 networkInfoEnabled: true
             )
         )
+
+        URLSessionInstrumentation.enable(
+            with: .init(delegateClass: DataDogSessionDelegate.self)
+        )
     }
 
     func setVerbosityLevel() {

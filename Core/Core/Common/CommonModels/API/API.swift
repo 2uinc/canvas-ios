@@ -25,7 +25,7 @@ public class API {
 
     internal lazy var refreshTokenInteractor = TokenRefreshInteractor(api: self)
 
-    public init(_ loginSession: LoginSession? = nil, baseURL: URL? = nil, urlSession: URLSession = .ephemeral) {
+    public init(_ loginSession: LoginSession? = nil, baseURL: URL? = nil, urlSession: URLSession = .instrumented) {
         self.loginSession = loginSession
         self.baseURL = baseURL ?? loginSession?.baseURL ?? URL(string: "https://canvas.instructure.com/")!
         self.urlSession = urlSession
@@ -46,6 +46,9 @@ public class API {
             }
 
             let request = try requestable.urlRequest(relativeTo: baseURL, accessToken: loginSession?.accessToken, actAsUserID: loginSession?.actAsUserID)
+            #if DEBUG
+            let requestStart = Date()
+            #endif
             let handler = { [weak self] (data: Data?, response: URLResponse?, error: Error?) in
                 if response?.isUnauthorized == true, refreshToken {
                     if let self {
@@ -71,12 +74,27 @@ public class API {
                     return callback(nil, response, error)
                 }
                 do {
-                    callback(try requestable.decode(data), response, error)
-                } catch let error {
                     #if DEBUG
-                    print(request, response ?? "", String(data: data, encoding: .utf8) ?? "", error)
+                    APIRequestLogger.log(
+                        request: request,
+                        response: response,
+                        data: data,
+                        error: nil,
+                        startedAt: requestStart
+                    )
                     #endif
-                    callback(nil, response, APIError.from(data: data, response: response, error: error))
+                    callback(try requestable.decode(data), response, error)
+                } catch let decodeError {
+                    #if DEBUG
+                    APIRequestLogger.log(
+                        request: request,
+                        response: response,
+                        data: data,
+                        error: decodeError,
+                        startedAt: requestStart
+                    )
+                    #endif
+                    callback(nil, response, APIError.from(data: data, response: response, error: decodeError))
                 }
             }
             let task: APITask

@@ -67,6 +67,8 @@ targets:
         product: DatadogCore
       - package: DataDog
         product: DatadogLogs
+      - package: DataDog
+        product: DatadogTrace
     preBuildScripts:
       - path: ../scripts/xcode-build-phases/swiftLint.sh
         name: SwiftLint
