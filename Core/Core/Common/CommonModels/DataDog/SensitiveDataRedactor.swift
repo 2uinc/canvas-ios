@@ -20,7 +20,7 @@ import Foundation
 
 /// Utility for redacting sensitive information from URLs and messages
 /// to prevent exposure of tokens, credentials, and PII in Datadog logs.
-enum SensitiveDataRedactor {
+public enum SensitiveDataRedactor {
 
     /// Patterns of sensitive data to redact
     private static let sensitivePatterns = [
@@ -56,7 +56,7 @@ enum SensitiveDataRedactor {
     ///
     /// - Parameter input: The string to redact (URL, error message, etc.)
     /// - Returns: The redacted string with sensitive values masked.
-    static func redact(_ input: String) -> String {
+    static public func redact(_ input: String) -> String {
         var result = input
         for pattern in sensitivePatterns {
             do {
