@@ -30,6 +30,7 @@ import PSPDFKit
 import UIKit
 import UserNotifications
 import DatadogLogs
+import DatadogTrace
 
 @UIApplicationMain
 class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDelegate {
@@ -95,6 +96,10 @@ class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDele
         }
         setupAWS()
         setupBugfender()
+
+        // Mark app fully loaded for performance tracking
+        RUMMonitor.shared().reportAppFullyDisplayed()
+
         return true
     }
 
@@ -112,40 +117,6 @@ class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDele
     func setupBugfender() {
         guard let bugfenderKey = Secret.bugfenderKey.string else { return }
         Bugfender.activateLogger(bugfenderKey)
-    }
-
-    func setupDatadog() {
-        guard let appID = Secret.datadogAppID.string, let clientToken = Secret.datadogClientToken.string else { return }
-
-        #if DEBUG
-        let environment = "debug"
-        #else
-        let environment = "production"
-        #endif
-
-        Datadog.initialize(
-            with: Datadog.Configuration(
-                clientToken: clientToken,
-                env: environment,
-                service: "ios-degrees",
-                backgroundTasksEnabled: true
-            ),
-            trackingConsent: .granted
-        )
-
-        CrashReporting.enable()
-
-        RUM.enable(
-            with: RUM.Configuration(
-                applicationID: appID,
-                uiKitViewsPredicate: DefaultUIKitRUMViewsPredicate(),
-                uiKitActionsPredicate: DefaultUIKitRUMActionsPredicate(),
-                appHangThreshold: 0.25,
-                trackWatchdogTerminations: true
-            )
-        )
-
-        Logs.enable()
     }
 
     func setup(session: LoginSession) {
@@ -622,5 +593,95 @@ extension StudentAppDelegate {
             let activities = nav.viewControllers.first as? ActivityStreamViewController {
             activities.refreshData(force: true)
         }
+    }
+}
+
+extension StudentAppDelegate {
+    func setupDatadog() {
+        guard let appID = Secret.datadogAppID.string, let clientToken = Secret.datadogClientToken.string else { return }
+
+        #if DEBUG
+        let environment = "debug"
+        #else
+        let environment = "production"
+        #endif
+
+        Datadog.initialize(
+            with: Datadog.Configuration(
+                clientToken: clientToken,
+                env: environment,
+                service: "ios-degrees",
+                backgroundTasksEnabled: true
+            ),
+            trackingConsent: .granted
+        )
+
+        setVerbosityLevel()
+
+        CrashReporting.enable()
+
+        RUM.enable(
+            with: RUM.Configuration(
+                applicationID: appID,
+                uiKitViewsPredicate: DefaultUIKitRUMViewsPredicate(),
+                uiKitActionsPredicate: DefaultUIKitRUMActionsPredicate(),
+                swiftUIViewsPredicate: DefaultSwiftUIRUMViewsPredicate(),
+                swiftUIActionsPredicate: DefaultSwiftUIRUMActionsPredicate(isLegacyDetectionEnabled: true),
+                urlSessionTracking: RUM.Configuration.URLSessionTracking(),
+                appHangThreshold: 0.25,
+                trackWatchdogTerminations: true
+            )
+        )
+
+        Logs.enable()
+
+        // MARK: - Datadog Tracing Configuration
+
+        /*
+         Enables Datadog Distributed Tracing (APM - Application Performance Monitoring)
+
+         Purpose:
+         - Tracks performance of network requests and app operations
+         - Measures API response times and latency
+        */
+
+        Trace.enable(
+            with: Trace.Configuration(
+                networkInfoEnabled: true
+            )
+        )
+    }
+
+    func setVerbosityLevel() {
+        // MARK: - Datadog Debug Configuration
+
+        /*
+         This configuration ensures that Datadog debug features are enabled
+         only during development (DEBUG builds) and disabled in production.
+
+         Purpose:
+         - Help developers debug Datadog integration
+         - Provide detailed logs and RUM (Real User Monitoring) insights during development
+         - Avoid unnecessary logging and performance overhead in release builds
+        */
+
+        #if DEBUG
+
+        // Enable verbose logging for Datadog SDK
+        // This prints detailed internal logs to the console, useful for debugging
+        Datadog.verbosityLevel = .debug
+
+        // Enable debug mode for Real User Monitoring (RUM)
+        // This provides additional visibility into user interactions,
+        // network requests, errors, and performance metrics during development
+        RUMMonitor.shared().debug = true
+
+        #else
+
+        // Disable verbose logging in release builds
+        // This ensures better performance and avoids exposing internal logs
+        Datadog.verbosityLevel = nil
+
+        #endif
     }
 }
