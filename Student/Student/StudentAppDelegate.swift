@@ -97,9 +97,6 @@ class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDele
         setupAWS()
         setupBugfender()
 
-        // Mark app fully loaded for performance tracking
-        RUMMonitor.shared().reportAppFullyDisplayed()
-
         return true
     }
 
@@ -622,8 +619,6 @@ extension StudentAppDelegate {
             trackingConsent: .granted
         )
 
-        setVerbosityLevel()
-
         CrashReporting.enable()
 
         RUM.enable(
@@ -654,6 +649,11 @@ extension StudentAppDelegate {
                 }
             )
         )
+
+        setVerbosityLevel()
+
+        // Mark app fully loaded for performance tracking when RUM is enabled.
+        RUMMonitor.shared().reportAppFullyDisplayed()
 
         Logs.enable()
 
