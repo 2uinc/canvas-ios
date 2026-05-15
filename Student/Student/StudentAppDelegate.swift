@@ -524,6 +524,12 @@ extension StudentAppDelegate: LoginDelegate {
 
     func userDidLogin(session: LoginSession) {
         LoginSession.add(session)
+        Datadog.setUserInfo(
+            id: session.userID,
+            name: nil,
+            email: nil,
+            extraInfo: [:]
+        )
         setup(session: session)
         setupOffline(for: session)
     }
