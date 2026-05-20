@@ -41,6 +41,9 @@ public enum Secret {
     /// The value passed to `PendoManager.shared().setup(:)`
     case pendoApiKey
 
+    /// Datadog keys
+    case datadogAppID, datadogClientToken
+
     /// Users for UI tests
     case testReadAdmin1, testReadStudent1, testReadStudent2, testReadStudentK5, testReadTeacher1, testReadParent1
     case testLDAPUser, testNotEnrolled, testSAMLUser, testVanityDomainUser

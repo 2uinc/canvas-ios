@@ -45,8 +45,11 @@ packages:
   Swifter:
     url: https://github.com/httpswift/swifter
     version: 1.5.0
+  DataDog:
+    url: https://github.com/Datadog/dd-sdk-ios.git
+    exactVersion: 3.10.0
 targets:
-  Core:    
+  Core:
     type: framework
     platform: iOS
     sources:
@@ -60,6 +63,12 @@ targets:
       - package: CombineReachability
       - package: mobile-offline-downloader-ios
       - package: SwiftUIIntrospect
+      - package: DataDog
+        product: DatadogCore
+      - package: DataDog
+        product: DatadogLogs
+      - package: DataDog
+        product: DatadogTrace
     preBuildScripts:
       - path: ../scripts/xcode-build-phases/swiftLint.sh
         name: SwiftLint
@@ -68,7 +77,7 @@ targets:
           - $(SRCROOT)/.swiftlint.yml
     settings:
       SWIFT_EMIT_LOC_STRINGS: true
-  CoreTests:    
+  CoreTests:
     type: bundle.unit-test
     platform: iOS
     settings:

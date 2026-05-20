@@ -22,10 +22,15 @@ import AWSSNS
 import BugfenderSDK
 import Combine
 import Core
+import DatadogCore
+import DatadogRUM
+import DatadogCrashReporting
 import Firebase
 import PSPDFKit
 import UIKit
 import UserNotifications
+import DatadogLogs
+import DatadogTrace
 
 @UIApplicationMain
 class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDelegate {
@@ -55,6 +60,7 @@ class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDele
             CourseSyncBackgroundUpdatesAssembly.makeOfflineSyncBackgroundTask()
         }
         BackgroundProcessingAssembly.resolveInteractor().register(taskID: OfflineSyncBackgroundTaskRequest.ID)
+        setupDatadog()
         setupFirebase()
         CacheManager.resetAppIfNecessary()
 
@@ -90,6 +96,7 @@ class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDele
         }
         setupAWS()
         setupBugfender()
+
         return true
     }
 
@@ -246,7 +253,7 @@ class StudentAppDelegate: UIResponder, UIApplicationDelegate, AppEnvironmentDele
     }
 
     // If the application is launched from the background, we pass the completion from the `handleEventsForBackgroundURLSession` function.
-    // If the application is launched normally, we don't need to pass system completion, the url session will tear down when it's finished. 
+    // If the application is launched normally, we don't need to pass system completion, the url session will tear down when it's finished.
     private func setupFileSubmissionAssemblyForBackgroundUploads(completion: (() -> Void)?) {
         let backgroundAssembly = FileSubmissionAssembly.makeShareExtensionAssembly()
         backgroundAssembly.connectToBackgroundURLSession {
@@ -514,6 +521,12 @@ extension StudentAppDelegate: LoginDelegate {
 
     func userDidLogin(session: LoginSession) {
         LoginSession.add(session)
+        Datadog.setUserInfo(
+            id: session.userID,
+            name: nil,
+            email: nil,
+            extraInfo: [:]
+        )
         setup(session: session)
         setupOffline(for: session)
     }
@@ -583,5 +596,118 @@ extension StudentAppDelegate {
             let activities = nav.viewControllers.first as? ActivityStreamViewController {
             activities.refreshData(force: true)
         }
+    }
+}
+
+extension StudentAppDelegate {
+    func setupDatadog() {
+        guard let appID = Secret.datadogAppID.string, let clientToken = Secret.datadogClientToken.string else { return }
+
+        #if DEBUG
+        let environment = "debug"
+        #else
+        let environment = "production"
+        #endif
+
+        Datadog.initialize(
+            with: Datadog.Configuration(
+                clientToken: clientToken,
+                env: environment,
+                service: "degrees-mobile",
+                backgroundTasksEnabled: true
+            ),
+            trackingConsent: .granted
+        )
+
+        CrashReporting.enable()
+
+        RUM.enable(
+            with: RUM.Configuration(
+                applicationID: appID,
+                uiKitViewsPredicate: DefaultUIKitRUMViewsPredicate(),
+                uiKitActionsPredicate: DefaultUIKitRUMActionsPredicate(),
+                swiftUIViewsPredicate: DefaultSwiftUIRUMViewsPredicate(),
+                swiftUIActionsPredicate: DefaultSwiftUIRUMActionsPredicate(isLegacyDetectionEnabled: true),
+                urlSessionTracking: RUM.Configuration.URLSessionTracking(),
+                appHangThreshold: 0.25,
+                trackWatchdogTerminations: true,
+                resourceEventMapper: { resourceEvent in
+                    var resourceEvent = resourceEvent
+                    resourceEvent.resource.url = SensitiveDataRedactor.redact(resourceEvent.resource.url)
+                    return resourceEvent
+                },
+                errorEventMapper: { errorEvent in
+                    var errorEvent = errorEvent
+                    // Redact error message
+                    errorEvent.error.message = SensitiveDataRedactor.redact(errorEvent.error.message)
+                    // Redact resource URL if present
+                    if var resource = errorEvent.error.resource {
+                        resource.url = SensitiveDataRedactor.redact(resource.url)
+                        errorEvent.error.resource = resource
+                    }
+                    return errorEvent
+                }
+            )
+        )
+
+        setVerbosityLevel()
+
+        // Mark app fully loaded for performance tracking when RUM is enabled.
+        RUMMonitor.shared().reportAppFullyDisplayed()
+
+        Logs.enable()
+
+        // MARK: - Datadog Tracing Configuration
+
+        /*
+         Enables Datadog Distributed Tracing (APM - Application Performance Monitoring)
+
+         Purpose:
+         - Tracks performance of network requests and app operations
+         - Measures API response times and latency
+        */
+
+        Trace.enable(
+            with: Trace.Configuration(
+                networkInfoEnabled: true
+            )
+        )
+
+        URLSessionInstrumentation.enable(
+            with: .init(delegateClass: DataDogSessionDelegate.self)
+        )
+    }
+
+    func setVerbosityLevel() {
+        // MARK: - Datadog Debug Configuration
+
+        /*
+         This configuration ensures that Datadog debug features are enabled
+         only during development (DEBUG builds) and disabled in production.
+
+         Purpose:
+         - Help developers debug Datadog integration
+         - Provide detailed logs and RUM (Real User Monitoring) insights during development
+         - Avoid unnecessary logging and performance overhead in release builds
+        */
+
+        #if DEBUG
+
+        // Enable verbose logging for Datadog SDK
+        // This prints detailed internal logs to the console, useful for debugging
+        Datadog.verbosityLevel = .debug
+
+        // Enable debug mode for Real User Monitoring (RUM)
+        // This provides additional visibility into user interactions,
+        // network requests, errors, and performance metrics during development
+        RUMMonitor.shared().debug = true
+
+        #else
+
+        // Disable verbose logging in release builds
+        // This ensures better performance and avoids exposing internal logs
+        Datadog.verbosityLevel = nil
+
+        #endif
     }
 }

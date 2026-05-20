@@ -3,7 +3,7 @@ targets:
   Student:
     type: application
     platform: iOS
-    transitivelyLinkDependencies: false
+    transitivelyLinkDependencies: true
     settings:
       APPLICATION_EXTENSION_API_ONLY: false
       SWIFT_EMIT_LOC_STRINGS: true
@@ -29,6 +29,28 @@ targets:
       - package: FirebaseCrashlytics
       - package: FirebaseRemoteConfig
       - package: FirebaseRemoteConfigSwift
+      - package: Realm
+        product: RealmSwift
+        embed: true
+        codeSign: true
+      - package: DataDog
+        product: DatadogCore
+      - package: DataDog
+        product: DatadogLogs
+      - package: DataDog
+        product: DatadogTrace
+      - package: DataDog
+        product: DatadogRUM
+      - package: DataDog
+        product: DatadogSessionReplay
+      - package: DataDog
+        product: DatadogCrashReporting
+      - package: DataDog
+        product: DatadogWebViewTracking
+      - package: DataDog
+        product: DatadogFlags
+      - package: DataDog
+        product: DatadogProfiling
       - target: Core/Core
       - target: SubmitAssignment
       - target: Widgets
