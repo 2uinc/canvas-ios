@@ -2,7 +2,7 @@ name: iOS CI/CD
 
 on:
   push:
-    branches: ["features/cicd"]
+    branches: ["features/cicd", "test"]
 
 jobs:
   build:
