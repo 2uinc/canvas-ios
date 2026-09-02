@@ -32,6 +32,8 @@ const path = require('path')
 const { execSync } = require('child_process')
 const run = (cmd) => execSync(cmd, { stdio: 'inherit' })
 
+console.log(process.argv)
+
 for (const secret of process.argv.slice(2)) {
   let [ name, ...value ] = secret.split('=')
   value = value.join('=')
