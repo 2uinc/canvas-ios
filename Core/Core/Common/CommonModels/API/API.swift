@@ -27,7 +27,7 @@ public class API {
 
     public init(_ loginSession: LoginSession? = nil, baseURL: URL? = nil, urlSession: URLSession = .instrumented) {
         self.loginSession = loginSession
-        self.baseURL = baseURL ?? loginSession?.baseURL ?? URL(string: "https://sso.instructure.com/")!
+        self.baseURL = baseURL ?? loginSession?.baseURL ?? URL(string: "https://sso.canvaslms.com/")!
         self.urlSession = urlSession
     }
 
