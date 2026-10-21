@@ -18,3 +18,8 @@ if [ ! -f "$AWS_KEYS_PATH/bugfenderKey.dataset/bugfenderKey" ]; then
 echo "error: bugfenderKey is not present. Run in Terminal: yarn build-secrets \"bugfenderKey=bugfender_key_here\""
 exit 1
 fi
+
+if [ ! -f "$AWS_KEYS_PATH/firebaseApiKey.dataset/firebaseApiKey" ]; then
+echo "error: firebaseApiKey is not present. Run in Terminal: yarn build-secrets \"firebaseApiKey=firebase_api_key_here\""
+exit 1
+fi
