@@ -73,8 +73,11 @@ class SubmitAssignmentViewController: UIViewController {
     }
 
     private func setupFirebaseServices() {
-        guard FirebaseOptions.defaultOptions()?.apiKey != nil else { return }
-        FirebaseApp.configure()
+        guard let apiKey = Secret.firebaseApiKey.string,
+              let options = FirebaseOptions.defaultOptions()?.copy() as? FirebaseOptions
+        else { return }
+        options.apiKey = apiKey
+        FirebaseApp.configure(options: options)
         Core.Analytics.shared.handler = self
         RemoteLogger.shared.handler = self
     }

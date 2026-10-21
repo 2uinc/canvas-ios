@@ -382,8 +382,10 @@ extension StudentAppDelegate {
             return
         }
 
-        if FirebaseOptions.defaultOptions()?.apiKey != nil {
-            FirebaseApp.configure()
+        if let apiKey = Secret.firebaseApiKey.string,
+           let options = FirebaseOptions.defaultOptions()?.copy() as? FirebaseOptions {
+            options.apiKey = apiKey
+            FirebaseApp.configure(options: options)
             configureRemoteConfig()
             Core.Analytics.shared.handler = self
             RemoteLogger.shared.handler = self
